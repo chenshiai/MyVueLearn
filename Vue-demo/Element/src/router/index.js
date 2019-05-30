@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import Main from '@/components/Main'
 import MainDetail from '@/components/MainDetail'
+import UserList from '@/components/UserList'
 Vue.use(Router)
 
 export default new Router({
@@ -27,6 +28,11 @@ export default new Router({
           path: '/',
           name: MainDetail,
           component: MainDetail
+        },
+        {
+          path: '/main-list',
+          name: UserList,
+          component: UserList
         }
       ]
     }
