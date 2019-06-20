@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { home, login } from 'pages/'
+import { home, login, register } from 'pages/'
 Vue.use(VueRouter)
 
 const routes = [
@@ -14,7 +14,12 @@ const routes = [
     name: 'login',
     hidden: true,
     component: login
-  }
+  }, {
+    path: '/register',
+    name: 'register',
+    hidden: true,
+    component: register
+  }, 
 ]
 
 export default new VueRouter({

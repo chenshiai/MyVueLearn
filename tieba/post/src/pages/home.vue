@@ -34,7 +34,7 @@
                         :key="index"
                         class="tag"
                       >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
-                      <span class="item-title">{{item.postTitle}}</span>
+                      <span class="item-title cup">{{item.postTitle}}</span>
                     </div>
                     <div class="item-summary">{{item.postContent}}</div>
                     <div class="item-img">
@@ -155,6 +155,10 @@ export default {
   .item-title {
     line-height: 20px;
     color: #4f4f4f;
+    &:hover{
+      color:#ffc343;
+      text-decoration: #4f4f4f;
+    }
   }
   .tag {
     padding: 0 5px;

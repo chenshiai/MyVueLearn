@@ -4,13 +4,23 @@ const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
 
 
 module.exports = {
+  devServer: {
+    host: '127.0.0.1',
+    port: 8010,
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true
+      }
+    }
+  },
   context: path.resolve(__dirname, '../'),
   entry: {
     app: './src/main.js'

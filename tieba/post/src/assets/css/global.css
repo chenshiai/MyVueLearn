@@ -124,3 +124,7 @@ p {
   transform: translate3d(0, 50px, 0);
   opacity: 0;
 }
+/* 鼠标移上去出现手指 */
+.cup{
+  cursor: pointer;
+}

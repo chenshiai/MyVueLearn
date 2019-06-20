@@ -31,9 +31,9 @@ export default {
   data() {
     return {
       postInfo: {
-        postname: "速度与激情",
+        postname: "旅梦开发团吧",
         introduction:
-          "欢迎来到速度与激情论坛，在这里你可以“无照驾驶”，欢迎来分享驾驶心得",
+          "欢迎来到旅梦开发团吧，在这里你可以和大家一起学习新的技术、分享自己的心得",
         usernumber: 108,
         postnumber: 23040
       }

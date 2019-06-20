@@ -6,16 +6,11 @@
       <transition name="form-fade" mode="in-out">
         <section class="form-container section-card" v-show="showLogin">
           <div class="manage-tip">
-            <span class="title">登录一起来哈皮！</span>
+            <span class="title">谢天谢地你来了！</span>
           </div>
           <el-form ref="loginForm" :model="loginForm" :rules="rules" class="loginForm">
             <el-form-item prop="username">
-              <el-input
-                class="area"
-                type="text"
-                placeholder="输入你的用户名"
-                v-model="loginForm.username"
-              />
+              <el-input class="area" type="text" placeholder="输入你的账号" v-model="loginForm.username"/>
             </el-form-item>
             <el-form-item prop="password">
               <el-input
@@ -25,9 +20,12 @@
                 v-model="loginForm.password"
               />
             </el-form-item>
+            <el-form-item prop="nickname">
+              <el-input class="area" type="text" placeholder="输入你的昵称" v-model="loginForm.nickname"/>
+            </el-form-item>
           </el-form>
-          <div class="tologin" @click="tologin">登录</div>
-          <div class="toregister" @click="toregister">没有账号，去注册>></div>
+          <div class="tologin" @click="toregister">注册</div>
+          <div class="toregister" @click="tologin">已有账号，去登录>></div>
         </section>
       </transition>
     </div>
@@ -39,22 +37,28 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer.vue";
 import { mapActions } from "vuex";
+// 这个页面解构与登录页面相同，类名没有变化，数据只有小部分变化，
 export default {
-  name: "login",
+  name: "regiser",
   data() {
     return {
       showLogin: false,
       ip: "",
       loginForm: {
         username: "",
-        password: ""
+        password: "",
+        nickname: ""
       },
       rules: {
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
+          { required: true, message: "请给自己一个账号", trigger: "blur" },
           { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
         ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        nickname: [
+          { required: true, message: "真的要叫你无名氏吗？", trigger: "blur" },
+          { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
+        ]
       }
     };
   },
@@ -68,12 +72,15 @@ export default {
   methods: {
     ...mapActions(["userLogin"]),
     tologin: function() {
+      this.$router.push("/login");
+    },
+    toregister: function() {
       this.$refs["loginForm"].validate(valid => {
         if (valid) {
-          this.axios.post("/api/login", this.loginForm).then(res => {
+          this.axios.post("/api/register", this.loginForm).then(res => {
             if (res.data.status > 0) {
               this.$message({
-                message: "欢迎回来，"+ res.data.data.nickname+"。",
+                message: "注册成功！已自动登录。",
                 type: "success"
               });
               this.userLogin(res.data.data);
@@ -86,9 +93,6 @@ export default {
           });
         }
       });
-    },
-    toregister: function() {
-      this.$router.push("/register");
     }
   }
 };
