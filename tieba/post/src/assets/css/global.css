@@ -1,0 +1,126 @@
+/* 初始化CSS */
+
+html {
+  font-size: 16px;
+}
+
+body, ol, ul, h1, h2, h3, h4, h5, h6, p, th, td, dl, dd, form, fieldset, legend, input, textarea, select {
+  margin: 0;
+  padding: 0;
+}
+*, :after, :before {
+  box-sizing: border-box;
+}
+body {
+  overflow-x: hidden;
+  font-family: 'sao_font', 'sao_icon', Arial, "微软雅黑";
+  background: #f2f2f2;
+  -webkit-text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+a {
+  color: #dd3333;
+  text-decoration: none;
+}
+
+em {
+  font-style: normal
+}
+
+li {
+  list-style: none;
+}
+
+img {
+  border: 0;
+  vertical-align: middle;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0
+}
+
+p {
+  word-wrap: break-word
+}
+
+/* 内容居中 */
+
+.container {
+  width: 1170px;
+  margin: 0 auto;
+  padding: 0 15px 0 15px;
+}
+
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: 1070px;
+  }
+}
+.content-left {
+  float: left;
+  width: 66.1538461538%;
+}
+
+.content-right {
+  float: right;
+  width: 32.3076923077%;
+}
+
+/* sectionCard样式 */
+
+.section-card {
+  background-color: #fff;
+  border-radius: 3px;
+  margin-top: 20px;
+  
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .05);
+}
+
+/* head样式 */
+.head {
+  top: 0;
+  width: 100%;
+  background-color: #ffc343;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
+  border-bottom: solid 2px #fff;
+}
+/* footer样式 */
+.footer{
+  float: left;
+  width: 100%;
+  line-height: 50px;
+  background-color: #4f4f4f;
+  margin-top: 50px;
+}
+/* vue transition淡入样式 */
+.form-fade-enter-active,
+.form-fade-leave-active {
+  transition: all 1s;
+}
+.form-fade-enter,
+.form-fade-leave {
+  transform: translate3d(0, 50px, 0);
+  opacity: 0;
+}
