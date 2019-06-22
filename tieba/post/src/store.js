@@ -4,24 +4,24 @@ Vue.use(Vuex)
 
 const state = {
   userinfo: {
-    username: '',
-    password: ''
+    user_id: '',
+    nickname: ''
   }
 }
 
 const getters = {
-  isLogin: (state) => state.userinfo.username != '' ? true : false
+  isLogin: (state) => state.userinfo.user_id ? true : false
 }
 
 const mutations = {
   userLogin: (state, userinfo) => {
-
-    state.userinfo = userinfo
-    console.log(state.userinfo)
+    let { nickname, user_id } = userinfo
+    nickname = unescape(nickname)
+    state.userinfo = { nickname, user_id }
   },
   cancelLogin: (state) => {
     state.userinfo = {
-      username: '',
+      user_id: '',
       nickname: ''
     }
   }
@@ -35,6 +35,18 @@ const actions = {
   cancelLogin: ({ commit }) => {
     // 注销登录
     commit('cancelLogin')
+    document.cookie = 'userinfo='
+  },
+  getCookie: ({ commit }, cname) => {
+    let name = cname + "="
+    let ca = document.cookie.split(";")
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i].trim()
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+    return null
   }
 }
 

@@ -2,9 +2,10 @@
 import login from './login.vue'
 import home from './home.vue'
 import register from './register.vue'
-
+import postlist from './postlist.vue'
 export {
   login,
   home,
-  register
+  register,
+  postlist
 }

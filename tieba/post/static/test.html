@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .item-head {
+      display: flex;
+      margin-top: 5px;
+      font-size: 1.2rem;
+    }
+
+    .item-title {
+      color: #4f4f4f;
+      transition: all 0.3s;
+      line-height: 30px;
+
+      /*  overflow: hidden; */
+    }
+
+    .item-title:hover {
+      color: #ffc343;
+      position: relative;
+    }
+
+    .item-title:hover::before {
+      content: "";
+      position: absolute;
+      top: 25px;
+      width: 200%;
+      height: 5px;
+      background: linear-gradient(135deg,
+        transparent,
+        transparent 45%,
+        #ffc343,
+        transparent 55%,
+        transparent 100%),
+        linear-gradient(45deg,
+        transparent,
+        transparent 45%,
+        #ffc343,
+        transparent 55%,
+        transparent 100%);
+      background-size: 10px 10px;
+      background-repeat: repeat-x;
+      animation: waveline 1s infinite linear;
+    }
+
+    /* // 波浪线 */
+    @keyframes waveline {
+      0% {
+        left: 0px;
+      }
+
+      100% {
+        left: -100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="item-head">
+    <!-- 帖子标签 -->
+    <span class="item-title cup">帖子标题</span>
+  </div>
+</body>
+
+</html>

@@ -26,7 +26,7 @@
               />
             </el-form-item>
           </el-form>
-          <div class="tologin" @click="tologin">登录</div>
+          <el-button type="primary" :loading="submiting" class="tologin" @click="tologin">登录</el-button>
           <div class="toregister" @click="toregister">没有账号，去注册>></div>
         </section>
       </transition>
@@ -55,7 +55,8 @@ export default {
           { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
         ],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }]
-      }
+      },
+      submiting: false
     };
   },
   components: {
@@ -68,12 +69,13 @@ export default {
   methods: {
     ...mapActions(["userLogin"]),
     tologin: function() {
+      this.submiting = true;
       this.$refs["loginForm"].validate(valid => {
         if (valid) {
           this.axios.post("/api/login", this.loginForm).then(res => {
             if (res.data.status > 0) {
               this.$message({
-                message: "欢迎回来，"+ res.data.data.nickname+"。",
+                message: "欢迎回来，" + unescape(res.data.data.nickname) + "。",
                 type: "success"
               });
               this.userLogin(res.data.data);
@@ -82,8 +84,11 @@ export default {
               this.loginForm.username = "";
               this.loginForm.password = "";
               this.$message.error(res.data.msg);
+              this.submiting = false;
             }
           });
+        } else {
+          this.submiting = false
         }
       });
     },
@@ -120,6 +125,8 @@ export default {
   font-weight: bold;
   font-size: 1.3rem;
   text-align: center;
+  border: none;
+  padding: 0;
 }
 .tologin:hover {
   background-color: #ffcf67;

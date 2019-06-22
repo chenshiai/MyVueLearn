@@ -24,7 +24,7 @@
               <el-input class="area" type="text" placeholder="输入你的昵称" v-model="loginForm.nickname"/>
             </el-form-item>
           </el-form>
-          <div class="tologin" @click="toregister">注册</div>
+          <el-button type="primary" :loading="submiting" class="tologin" @click="toregister">注册</el-button>
           <div class="toregister" @click="tologin">已有账号，去登录>></div>
         </section>
       </transition>
@@ -59,7 +59,8 @@ export default {
           { required: true, message: "真的要叫你无名氏吗？", trigger: "blur" },
           { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
         ]
-      }
+      },
+      submiting: false
     };
   },
   components: {
@@ -75,6 +76,7 @@ export default {
       this.$router.push("/login");
     },
     toregister: function() {
+      this.submiting = true;
       this.$refs["loginForm"].validate(valid => {
         if (valid) {
           this.axios.post("/api/register", this.loginForm).then(res => {
@@ -89,8 +91,11 @@ export default {
               this.loginForm.username = "";
               this.loginForm.password = "";
               this.$message.error(res.data.msg);
+              this.submiting = false;
             }
           });
+        } else {
+        this.submiting = false;
         }
       });
     }
@@ -124,6 +129,8 @@ export default {
   font-weight: bold;
   font-size: 1.3rem;
   text-align: center;
+  border: none;
+  padding: 0;
 }
 .tologin:hover {
   background-color: #ffcf67;
