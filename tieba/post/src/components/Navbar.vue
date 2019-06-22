@@ -28,11 +28,11 @@
             </div>
           </div>
           <div class="login" v-show="!isLogin">
-            <span @click="userLogin" class="cup">
+            <span @click="toUserLogin" class="cup">
               <i class="el-icon-user-solid"></i>
               欢迎登录
             </span>
-            <span @click="userRegister" class="cup">
+            <span @click="toUserRegister" class="cup">
               <i class="el-icon-user"></i>
               点我注册
             </span>
@@ -55,25 +55,38 @@ export default {
   computed: {
     ...mapGetters(["isLogin"])
   },
+  mounted() {
+    let that = this;
+    this.getCookie("userinfo").then(userinfo => {
+      let user = userinfo.split("_");
+      let nickname = user[0];
+      let user_id = user[1];
+      that.userLogin({
+        nickname,
+        user_id
+      });
+    });
+    return null;
+  },
   methods: {
-    ...mapActions(['cancelLogin']),
+    ...mapActions(["cancelLogin", "userLogin", "getCookie"]),
     undone: function() {
       this.$message.error("该功能尚未实现");
     },
     lookPost: function() {
       this.$router.push("/");
     },
-    userLogin: function() {
+    toUserLogin: function() {
       this.$router.push("/login");
     },
-    userRegister: function() {
+    toUserRegister: function() {
       this.$router.push("/register");
     },
-    selfInfo: function(){
+    selfInfo: function() {
       this.showSelfInfo = !this.showSelfInfo;
     },
-    lookMyself: function(){
-      this.$message.error('个人中心功能未实现');
+    lookMyself: function() {
+      this.$message.error("个人中心功能未实现");
     }
   }
 };
@@ -138,7 +151,7 @@ export default {
               }
             }
             &:after {
-              content: '';
+              content: "";
               width: 0;
               height: 0;
               border-width: 0 20px 30px;
@@ -146,7 +159,7 @@ export default {
               border-color: transparent transparent #ffffff; /*透明 透明  灰*/
               position: absolute;
               top: -20px;
-              transform: translate3d(-20px,0,0);
+              transform: translate3d(-20px, 0, 0);
             }
           }
         }
@@ -163,11 +176,11 @@ export default {
 /* self-info transition淡入样式 */
 .self-fade-enter-active,
 .self-fade-leave-active {
-  transition: all .3s;
+  transition: all 0.3s;
   transform-origin: top center;
 }
 .self-fade-enter,
-.self-fade-leave {
+.self-fade-leave-to {
   transform: scale(0, 2.5);
   opacity: 0;
 }

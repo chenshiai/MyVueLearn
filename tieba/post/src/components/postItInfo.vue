@@ -60,12 +60,12 @@ export default {
     .post-title {
       font-size: 2.1rem;
       font-weight: bold;
-      color: #4f4f4f;
+      color: #303133;
     }
     .post-introduction,
     .post-user-numbar,
     .post-number {
-      color: #868686;
+      color: #909399;
       margin-top: 6px;
     }
     .follow{
