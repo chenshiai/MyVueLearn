@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { home, login, register, postlist, editPost,myDrafts } from 'pages/'
+import { home, login, register, postlist, editPost,myDrafts, lookPost } from 'pages/'
 Vue.use(VueRouter)
 
 const routes = [
@@ -37,6 +37,11 @@ const routes = [
     name: 'mydrafts',
     hidden: true,
     component: myDrafts
+  }, {
+    path: '/topic/:id',
+    name: 'lookPost',
+    hidden: true,
+    component: lookPost
   }
 ]
 

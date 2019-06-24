@@ -6,11 +6,13 @@ import register from './register.vue'
 import postlist from './postlist.vue'
 import editPost from './editPost.vue'
 import myDrafts from './myDrafts.vue'
+import lookPost from './lookpost.vue'
 export {
   login,
   home,
   register,
   postlist,
   editPost,
-  myDrafts
+  myDrafts,
+  lookPost
 }
