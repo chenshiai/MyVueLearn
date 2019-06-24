@@ -18,7 +18,7 @@
               </ul>
             </div>
             <!-- 帖子列表 -->
-            <router-view :stickyList="stickyList" :postList="postList"/>
+            <router-view :stickyList="stickyList" :postList="postList" @deletePost="deletePost"/>
             <div style="height: 50px"></div>
           </section>
         </div>
@@ -57,7 +57,9 @@ export default {
   },
   mounted() {
     this.showPage = true;
+    // 获取置顶帖
     this.getStickyList();
+    // 请求一页非置顶帖子
     this.lazyLoadList();
     // this.$router.push({
     //   name: "postlist",
@@ -90,6 +92,9 @@ export default {
           this.$message.error(res.data.msg);
         }
       });
+    },
+    deletePost: function(index){
+      this.postList.splice(index, 1);
     }
   }
 };

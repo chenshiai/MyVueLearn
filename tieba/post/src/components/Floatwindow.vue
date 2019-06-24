@@ -22,11 +22,15 @@
 </template>
 
 <script>
-import API from '../../static/js/global.js';
+import API from "../../static/js/global.js";
+import { mapGetters } from "vuex";
 export default {
   name: "floatwindow",
   data() {
     return {};
+  },
+  computed: {
+    ...mapGetters(["isLogin"])
   },
   methods: {
     goToTop: function() {
@@ -36,7 +40,11 @@ export default {
       this.$emit("reload");
     },
     editPost: function() {
-      this.$router.push({ name: "editPost", params: { status: "create" } });
+      if (!this.isLogin) {
+        this.$message.error("发帖功能需要先登录才行哦。");
+      } else {
+        this.$router.push({ name: "editPost", params: { status: "create" } });
+      }
     }
   }
 };

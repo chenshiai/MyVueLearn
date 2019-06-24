@@ -45,6 +45,7 @@ export default {
     return {
       showLogin: false,
       ip: "",
+      topicId: "",
       loginForm: {
         username: "",
         password: ""
@@ -66,13 +67,16 @@ export default {
   computed: {
     ...mapGetters(["isLogin"])
   },
+  created() {
+    this.topicId = this.$route.query.id;
+  },
   mounted() {
     this.showLogin = true;
     if (this.isLogin) {
       this.$message({
         message: "已经登录，自动跳转至首页。"
-      })
-      this.$router.push('/');
+      });
+      this.$router.push("/");
     }
   },
   methods: {
@@ -91,14 +95,20 @@ export default {
                   type: "success"
                 });
                 this.userLogin(res.data.data);
-                console.log('登录的返回结果',res.data.data )
-                this.$router.push("/");
+                // 如果是在帖子回复区点击的登录，则返回到帖子
+                if (this.topicId) {
+                  this.$router.push({ path: `/topic/${this.topicId}` });
+                } else {
+                  this.$router.push("/");
+                }
+
               } else {
                 this.loginForm.username = "";
                 this.loginForm.password = "";
                 this.$message.error(res.data.msg);
                 this.submiting = false;
               }
+              return;
             })
             .catch(err => {
               this.$message.error("服务器错误，登录失败！");

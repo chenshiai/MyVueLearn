@@ -64,9 +64,11 @@ export default {
       let user = userinfo.split("_");
       let nickname = user[0];
       let user_id = user[1];
+      let power = user[2];
       that.userLogin({
         nickname,
-        user_id
+        user_id,
+        power
       });
     }
     return null;

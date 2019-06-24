@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import marked from "marked";
 import { mapActions, mapGetters } from "vuex";
 import API from "../../static/js/global.js";
 export default {
@@ -72,11 +71,6 @@ export default {
   },
   computed: {
     ...mapGetters(["isLogin"]),
-    MDcontent: function() {
-      return marked(this.postInfo.content || "", {
-        sanitize: true
-      });
-    },
     changeDebounce: function() {
       let that = this;
       // 防抖处理
@@ -92,24 +86,22 @@ export default {
     }
   },
   mounted() {
-    // 判断是否登录，没登录跳去登录页
-    if (!this.isLogin) {
-      this.$router.push("/login");
-    } else {
+    if (this.$route.params.status === "create") {
+      // 点击发帖，新建一个帖子到草稿箱，并获取draftsId
       this.$notify.info({
         title: "来自网页的通知",
         message:
-          "这里是编辑页面，采用MarkDown语法，停止编辑一秒后，将会自动保存至草稿箱哦。"
+          "这里是编辑页面，采用MarkDown语法，字数限制2000字（含符号），停止编辑一秒后，将会自动保存至草稿箱哦。"
       });
-    }
-    if (this.$route.params.status === "create") {
-      // 点击发帖，新建一个帖子到草稿箱，并获取draftsId
       this.createPost();
     } else if (this.$route.params.status === "update") {
       // 如果是从更新帖子进来的编辑页就获取该帖子的内容
-      if (this.$route.params.postId) {
+      if (this.$route.params.post) {
+        // 将如有进来的参数传给当前页面并显示
+        this.postInfo = this.$route.params.post;
         this.$message({
-          message: "现在是编辑id为" + this.$route.params.postId + "的帖子"
+          type: "success",
+          message: "读取成功，可以开始编辑了！"
         });
       } else {
         this.$message.error("出现错误，请在首页进行反馈，谢谢！");
@@ -118,26 +110,35 @@ export default {
       // 如果是从草稿箱进来更新，需要草稿帖子的id作为参数
       this.editDrafts();
     } else {
-      this.$router.push("/");
-      this.$message.error('访问的资源不存在。')
+      // 如果是通过地址进入此页面则跳转回首页
+      this.$message.error("出现错误，即将跳转至首页。");
+      setTimeout(() => {
+        this.$router.push("/");
+      }, 500);
     }
   },
   methods: {
     publish: function() {
-      this.$confirm("即将发表，是否继续?", "大功告成了！", {
-        confirmButtonText: "发表",
-        cancelButtonText: "再改改",
-        type: "warning"
-      })
-        .then(() => {
-          this.publishSave();
+      // 再判断一次是否登录
+      if (!this.isLogin) {
+        this.$router.push("/login");
+        this.$message.error("白写了，请先登录");
+      } else {
+        this.$confirm("即将发表，是否继续?", "大功告成了！", {
+          confirmButtonText: "发表",
+          cancelButtonText: "再改改",
+          type: "warning"
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "再改改..."
+          .then(() => {
+            this.publishSave();
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "再改改..."
+            });
           });
-        });
+      }
     },
     changeContent: function() {
       // 内容一改变就触发
@@ -175,9 +176,12 @@ export default {
         this.$message.error("字数大于2000了！");
         return;
       }
+      // 如果postId存在，则表示更新帖子
+      // 如果postId不存在且draftsId存在，则表示草稿完成且发表
+      // 帖子内容和用户的信息作为帖子的参数
       this.axios
         .post("/api/publish", {
-          postId: this.$route.params.postId,
+          postId: this.postInfo.id,
           draftsId: this.draftsId,
           ...this.postInfo,
           ...this.$store.state.userinfo
@@ -198,7 +202,7 @@ export default {
         });
     },
     createPost: function() {
-      // 新建草稿的请求
+      // 新建草稿的请求，并获取草稿id
       this.axios
         .post("/api/publish/init", this.$store.state.userinfo)
         .then(res => {
@@ -217,8 +221,10 @@ export default {
       this.$router.push("/user/mydrafts");
     },
     editDrafts: function() {
+      // 拿到草稿箱传进来的草稿id
       if (this.$route.params.draftsId) {
         this.draftsId = this.$route.params.draftsId;
+        // 从vuex的缓存中，循环找到草稿内容给当前页面显示
         this.$store.state.userDrafts.forEach(draft => {
           if (draft.id == this.draftsId) {
             let title = draft.title || "";
@@ -234,6 +240,7 @@ export default {
           message: "读取完成，可以继续编辑草稿啦。"
         });
       } else {
+        // 如果没有参数进来
         this.$message.error("出现错误，请在首页进行反馈，谢谢！");
       }
     }
