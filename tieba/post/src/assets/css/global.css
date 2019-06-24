@@ -53,6 +53,20 @@ p {
 .bdff{
   border-color: #ffc343; 
 }
+
+/* 框选颜色 */
+::selection {
+  background:#ffc343;
+  color:#fff;
+}
+::-moz-selection {
+  background:#ccc;
+  color:#fff;
+}
+::-webkit-selection {
+  background:#ccc;
+  color:#fff;
+}
 /* 内容居中 */
 
 .container {
@@ -128,4 +142,17 @@ p {
 /* 鼠标移上去出现手指 */
 .cup{
   cursor: pointer;
+}
+
+/* 标签 */
+.tag {
+  margin: 5px 0;
+  padding: 0 5px;
+  line-height: 20px;
+  background-color: #ffc343;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.6rem;
+  text-align: center;
+  margin-right: 5px;
 }
