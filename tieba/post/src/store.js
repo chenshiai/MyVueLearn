@@ -5,8 +5,10 @@ Vue.use(Vuex)
 const state = {
   userinfo: {
     user_id: '',
-    nickname: ''
-  }
+    nickname: '',
+    power: 0
+  },
+  userDrafts: []
 }
 
 const getters = {
@@ -15,15 +17,24 @@ const getters = {
 
 const mutations = {
   userLogin: (state, userinfo) => {
-    let { nickname, user_id } = userinfo
+    console.log('store mutation',userinfo)
+    let { nickname, user_id, power } = userinfo
     nickname = unescape(nickname)
-    state.userinfo = { nickname, user_id }
+    state.userinfo = { nickname, user_id, power }
   },
   cancelLogin: (state) => {
     state.userinfo = {
       user_id: '',
-      nickname: ''
+      nickname: '',
+      power: 0
     }
+    document.cookie = 'userinfo='
+  },
+  setUserDrafts: (state, drafts) => {
+    state.userDrafts = drafts
+  },
+  deleteUserDrafts: (state, index)=>{
+    state.userDrafts.splice(index, 1)
   }
 }
 
@@ -31,22 +42,20 @@ const actions = {
   userLogin: ({ commit }, userinfo) => {
     // 设置登录信息
     commit('userLogin', userinfo)
+    console.log('store actions',userinfo)
   },
   cancelLogin: ({ commit }) => {
     // 注销登录
     commit('cancelLogin')
-    document.cookie = 'userinfo='
   },
-  getCookie: ({ commit }, cname) => {
-    let name = cname + "="
-    let ca = document.cookie.split(";")
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i].trim()
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length)
-      }
+  setUserDrafts: ({ commit }, drafts) => {
+    // 将用户草稿暂存在本地
+    if (drafts) {
+      commit('setUserDrafts', drafts)
     }
-    return null
+  },
+  deleteUserDrafts: ({commit}, index)=>{
+    commit('deleteUserDrafts', index)
   }
 }
 

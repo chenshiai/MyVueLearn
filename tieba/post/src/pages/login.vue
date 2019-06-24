@@ -38,7 +38,7 @@
 <script>
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer.vue";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 export default {
   name: "login",
   data() {
@@ -63,8 +63,17 @@ export default {
     Navbar,
     Footer
   },
+  computed: {
+    ...mapGetters(["isLogin"])
+  },
   mounted() {
     this.showLogin = true;
+    if (this.isLogin) {
+      this.$message({
+        message: "已经登录，自动跳转至首页。"
+      })
+      this.$router.push('/');
+    }
   },
   methods: {
     ...mapActions(["userLogin"]),
@@ -72,23 +81,31 @@ export default {
       this.submiting = true;
       this.$refs["loginForm"].validate(valid => {
         if (valid) {
-          this.axios.post("/api/login", this.loginForm).then(res => {
-            if (res.data.status > 0) {
-              this.$message({
-                message: "欢迎回来，" + unescape(res.data.data.nickname) + "。",
-                type: "success"
-              });
-              this.userLogin(res.data.data);
-              this.$router.push("/");
-            } else {
-              this.loginForm.username = "";
-              this.loginForm.password = "";
-              this.$message.error(res.data.msg);
+          this.axios
+            .post("/api/login", this.loginForm)
+            .then(res => {
+              if (res.data.status > 0) {
+                this.$message({
+                  message:
+                    "欢迎回来，" + unescape(res.data.data.nickname) + "。",
+                  type: "success"
+                });
+                this.userLogin(res.data.data);
+                console.log('登录的返回结果',res.data.data )
+                this.$router.push("/");
+              } else {
+                this.loginForm.username = "";
+                this.loginForm.password = "";
+                this.$message.error(res.data.msg);
+                this.submiting = false;
+              }
+            })
+            .catch(err => {
+              this.$message.error("服务器错误，登录失败！");
               this.submiting = false;
-            }
-          });
+            });
         } else {
-          this.submiting = false
+          this.submiting = false;
         }
       });
     },

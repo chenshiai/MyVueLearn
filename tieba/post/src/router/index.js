@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { home, login, register, postlist } from 'pages/'
+import { home, login, register, postlist, editPost,myDrafts } from 'pages/'
 Vue.use(VueRouter)
 
 const routes = [
@@ -27,7 +27,17 @@ const routes = [
     name: 'register',
     hidden: true,
     component: register
-  }, 
+  }, {
+    path: '/editor/drafts',
+    name: 'editPost',
+    hidden: true,
+    component: editPost
+  }, {
+    path: '/user/mydrafts',
+    name: 'mydrafts',
+    hidden: true,
+    component: myDrafts
+  }
 ]
 
 export default new VueRouter({

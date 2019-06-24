@@ -47,7 +47,12 @@ table {
 p {
   word-wrap: break-word
 }
-
+.bgff{
+  background-color: #ffc343;
+}
+.bdff{
+  border-color: #ffc343; 
+}
 /* 内容居中 */
 
 .container {

@@ -4,7 +4,7 @@
       <div class="nav-bar">
         <div class="nav-bar-logo">LOGO</div>
         <ul class="nav-bar-list">
-          <li class="list-item" @click="lookPost">看贴</li>
+          <li class="list-item" @click="lookPost">看帖</li>
           <li class="list-item">热门</li>
           <li class="list-item">精品</li>
         </ul>
@@ -21,7 +21,8 @@
                 <div class="self-info section-card" v-show="showSelfInfo">
                   <ul>
                     <li @click="lookMyself">个人中心</li>
-                    <li @click="cancelLogin">退出登录</li>
+                    <li @click="myDrafts">草稿箱</li>
+                    <li @click="outLogin">退出登录</li>
                   </ul>
                 </div>
               </transition>
@@ -30,11 +31,11 @@
           <div class="login" v-show="!isLogin">
             <span @click="toUserLogin" class="cup">
               <i class="el-icon-user-solid"></i>
-              欢迎登录
+              登录
             </span>
             <span @click="toUserRegister" class="cup">
               <i class="el-icon-user"></i>
-              点我注册
+              注册
             </span>
           </div>
         </div>
@@ -45,6 +46,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import API from "../../static/js/global.js";
 export default {
   name: "Navbar",
   data() {
@@ -57,7 +59,8 @@ export default {
   },
   mounted() {
     let that = this;
-    this.getCookie("userinfo").then(userinfo => {
+    let userinfo = API.getCookie("userinfo");
+    if (userinfo) {
       let user = userinfo.split("_");
       let nickname = user[0];
       let user_id = user[1];
@@ -65,13 +68,17 @@ export default {
         nickname,
         user_id
       });
-    });
+    }
     return null;
   },
   methods: {
-    ...mapActions(["cancelLogin", "userLogin", "getCookie"]),
+    ...mapActions(["cancelLogin", "userLogin"]),
     undone: function() {
       this.$message.error("该功能尚未实现");
+    },
+    outLogin: function(){
+      this.$router.push('/');
+      this.cancelLogin();
     },
     lookPost: function() {
       this.$router.push("/");
@@ -87,6 +94,9 @@ export default {
     },
     lookMyself: function() {
       this.$message.error("个人中心功能未实现");
+    },
+    myDrafts: function(){
+      this.$router.push('/user/mydrafts')
     }
   }
 };

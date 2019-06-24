@@ -93,6 +93,9 @@ export default {
               this.$message.error(res.data.msg);
               this.submiting = false;
             }
+          }).catch(err=>{
+            this.$message.error('服务器错误，注册失败！');
+            this.submiting = false;
           });
         } else {
         this.submiting = false;

@@ -1,7 +1,7 @@
 <template>
   <div class="floatwindow">
     <ul class="float-list">
-      <li class="section-card">
+      <li class="section-card" @click="editPost">
         <i class="el-icon-edit-outline"></i>
         <span>发帖</span>
       </li>
@@ -22,30 +22,21 @@
 </template>
 
 <script>
+import API from '../../static/js/global.js';
 export default {
   name: "floatwindow",
   data() {
     return {};
   },
   methods: {
-    getScrollTop: function() {
-      var scrollTop = 0;
-      if (document.documentElement && document.documentElement.scrollTop) {
-        scrollTop = document.documentElement.scrollTop;
-      } else if (document.body) {
-        scrollTop = document.body.scrollTop;
-      }
-      return scrollTop;
-    },
     goToTop: function() {
-      let currentScroll = this.getScrollTop();
-      if (currentScroll > 0) {
-        window.requestAnimationFrame(this.goToTop);
-        window.scrollTo(0, currentScroll - currentScroll / 5);
-      }
+      API.goToTop();
     },
-    reload: function(){
-      this.$emit('reload')
+    reload: function() {
+      this.$emit("reload");
+    },
+    editPost: function() {
+      this.$router.push({ name: "editPost", params: { status: "create" } });
     }
   }
 };

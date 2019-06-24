@@ -19,6 +19,7 @@
             </div>
             <!-- 帖子列表 -->
             <router-view :stickyList="stickyList" :postList="postList"/>
+            <div style="height: 50px"></div>
           </section>
         </div>
         <!-- 右边侧栏 -->
@@ -28,7 +29,7 @@
       </div>
       <!-- 悬浮窗 -->
     </transition>
-<Floatwindow @reload="reloadPostList"/>
+    <Floatwindow @reload="reloadPostList"/>
     <Footer/>
   </div>
 </template>
@@ -43,87 +44,9 @@ export default {
   data() {
     return {
       showPage: false,
-      stickyList: [
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "你大爷楼主",
-          postTags: [1, 2, 3],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "../static/logo.png",
-          postTime: "2019-06-19",
-          postClick: "424",
-          postReply: "799"
-        },
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "你大爷楼主",
-          postTags: [1],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "../static/logo.png",
-          postTime: "2019-06-19",
-          postClick: "424",
-          postReply: "799"
-        },
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "你大爷楼主",
-          postTags: [1],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "../static/logo.png",
-          postTime: "2019-06-19",
-          postClick: "424",
-          postReply: "799"
-        }
-      ],
-      postList: [
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "ChenShiAi",
-          postTags: [2],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "../static/logo.png",
-          postTime: "2019-06-20",
-          postClick: "424",
-          postReply: "799"
-        },
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "ChenShiAi",
-          postTags: [],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "../static/logo.png",
-          postTime: "2019-06-20",
-          postClick: "424",
-          postReply: "799"
-        },
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "ChenShiAi",
-          postTags: [],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "",
-          postTime: "2019-06-20",
-          postClick: "424",
-          postReply: "799"
-        },
-        {
-          postTitle: "这里是一个帖子标题",
-          postUser: "ChenShiAi",
-          postTags: [],
-          postContent:
-            "这是一段测试内容这是一段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段段测试内容这是一段测试内容这是一段测试内容这是一段测试内容这是一段测试内容",
-          postImg: "sss.png",
-          postTime: "2019-06-20",
-          postClick: "424",
-          postReply: "799"
-        }
-      ]
+      stickyList: [],
+      postList: [],
+      page: 1
     };
   },
   components: {
@@ -134,21 +57,41 @@ export default {
   },
   mounted() {
     this.showPage = true;
-    this.$router.push({
-      name: "postlist",
-      params: {
-        postList: this.postList,
-        stickyList: this.stickyList
-      }
-    });
+    this.getStickyList();
+    this.lazyLoadList();
+    // this.$router.push({
+    //   name: "postlist",
+    //   params: {
+    //     postList: this.postList,
+    //     stickyList: this.stickyList
+    //   }
+    // });
   },
   methods: {
-    reloadPostList: function(){
+    reloadPostList: function() {
       this.$message({
-        message: '正在刷新页面'
-      })
+        message: "正在刷新页面"
+      });
+    },
+    getStickyList: function() {
+      this.axios.get("/api/postlist/sticky").then(res => {
+        if (res.data.status > 0) {
+          this.stickyList = res.data.data;
+        } else {
+          this.$message.error(res.data.msg);
+        }
+      });
+    },
+    lazyLoadList: function() {
+      this.axios.post("/api/postlist/page", { page: this.page }).then(res => {
+        if (res.data.status > 0) {
+          this.postList = res.data.data;
+        } else {
+          this.$message.error(res.data.msg);
+        }
+      });
     }
-  },
+  }
 };
 </script>
 
