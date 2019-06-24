@@ -61,13 +61,6 @@ export default {
     this.getStickyList();
     // 请求一页非置顶帖子
     this.lazyLoadList();
-    // this.$router.push({
-    //   name: "postlist",
-    //   params: {
-    //     postList: this.postList,
-    //     stickyList: this.stickyList
-    //   }
-    // });
   },
   methods: {
     reloadPostList: function() {
@@ -76,6 +69,7 @@ export default {
       });
     },
     getStickyList: function() {
+      // 获取置顶帖的请求
       this.axios.get("/api/postlist/sticky").then(res => {
         if (res.data.status > 0) {
           this.stickyList = res.data.data;
@@ -85,9 +79,10 @@ export default {
       });
     },
     lazyLoadList: function() {
+      // 根据page分页获取
       this.axios.post("/api/postlist/page", { page: this.page }).then(res => {
         if (res.data.status > 0) {
-          this.postList = res.data.data;
+          this.postList = [...this.postList,...res.data.data];
         } else {
           this.$message.error(res.data.msg);
         }
