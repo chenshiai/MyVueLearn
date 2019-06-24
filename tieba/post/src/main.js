@@ -13,7 +13,13 @@ import 'mavon-editor/dist/css/index.css';
 Vue.use(vueAxios, axios)
 Vue.use(ElementUI)
 Vue.use(mavonEditor)
-
+Vue.directive('focus', {
+  // ?????????? DOM ??……
+  inserted: function (el) {
+    // ????
+    el.focus()
+  }
+})
 new Vue({
   el: '#app',
   router,

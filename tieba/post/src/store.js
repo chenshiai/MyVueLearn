@@ -17,7 +17,6 @@ const getters = {
 
 const mutations = {
   userLogin: (state, userinfo) => {
-    console.log('store mutation',userinfo)
     let { nickname, user_id, power } = userinfo
     nickname = unescape(nickname)
     state.userinfo = { nickname, user_id, power }
@@ -42,7 +41,6 @@ const actions = {
   userLogin: ({ commit }, userinfo) => {
     // 设置登录信息
     commit('userLogin', userinfo)
-    console.log('store actions',userinfo)
   },
   cancelLogin: ({ commit }) => {
     // 注销登录
