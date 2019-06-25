@@ -19,7 +19,7 @@
                   :key="index"
                   class="tag"
                 >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
-                <span class="item-title cup" @click="lookPost(item.id)">{{item.title}}</span>
+                <span class="item-title cup" @click="lookPost(item)">{{item.title}}</span>
               </div>
               <!-- 帖子内容缩略 -->
               <div class="item-summary">{{item.content}}</div>
@@ -75,7 +75,7 @@
                 :key="index"
                 class="tag"
               >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
-              <span class="item-title cup" @click="lookPost(item.id)">{{item.title}}</span>
+              <span class="item-title cup" @click="lookPost(item)">{{item.title}}</span>
             </div>
             <!-- 帖子内容缩略 -->
             <div class="item-summary">{{item.content}}</div>
@@ -124,23 +124,18 @@ export default {
       let post = this.postList.map(item=>{
         return API.deepClone(item);
       })
-      return post.map(this.handleList);
+      return post.map(API.handleList);
     },
     stickys: function() {
       let sticky = this.stickyList.map(item=>{
         return API.deepClone(item);
       })
-      return sticky.map(this.handleList);
+      return sticky.map(API.handleList);
     }
   },
   methods: {
     stickyRetract: function() {
       this.stickyShow = !this.stickyShow;
-    },
-    handleList: function(item) {
-      item.tags = item.tags.split(",").filter(tag => tag != 0);
-      item.updated_at = API.utc2beijing(item.updated_at);
-      return item;
     },
     deleteConfirm: function(item, index){
       this.$confirm("即将删除这篇帖子，是否继续?", "帖子删除", {
@@ -177,8 +172,8 @@ export default {
     updatePost: function(item){
        this.$router.push({ name: "editPost", params: { status: "update", postId: item.id , post:item } });
     },
-    lookPost: function(id){
-      this.$router.push({path:`/topic/${id}`})
+    lookPost: function(item){
+      this.$router.push({path:`/topic/${item.id}`})
     }
   }
 };
