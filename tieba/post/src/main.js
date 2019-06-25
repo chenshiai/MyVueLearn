@@ -9,17 +9,45 @@ import axios from "axios"
 import vueAxios from 'vue-axios'
 import mavonEditor from 'mavon-editor';     //markdownç¼–è¾‘å™¨
 import 'mavon-editor/dist/css/index.css';
+import upperFirst from 'lodash/upperFirst'
+import camelCase from 'lodash/camelCase'
 
 Vue.use(vueAxios, axios)
 Vue.use(ElementUI)
 Vue.use(mavonEditor)
+
+
 Vue.directive('focus', {
-  // ?????????? DOM ??……
   inserted: function (el) {
-    // ????
     el.focus()
   }
 })
+const requireComponent = require.context('./components', false, /\.vue$/);
+requireComponent.keys().forEach(fileName => {
+  // ??????
+  const componentConfig = requireComponent(fileName)
+
+  // ????? PascalCase ??
+  const componentName = upperFirst(
+    camelCase(
+      // ?????????????
+      fileName
+        .split('/')
+        .pop()
+        .replace(/\.\w+$/, '')
+    )
+  )
+
+  // ??????
+  Vue.component(
+    componentName,
+    // ??????????? `export default` ????
+    // ???????? `.default`?
+    // ????????????
+    componentConfig.default || componentConfig
+  )
+})
+
 new Vue({
   el: '#app',
   router,
