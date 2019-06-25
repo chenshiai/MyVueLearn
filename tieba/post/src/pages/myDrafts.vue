@@ -26,9 +26,6 @@
 </template>
 
 <script>
-import Navbar from "../components/Navbar.vue";
-import PostItInfo from "../components/postItInfo.vue";
-import Footer from "../components/Footer.vue";
 import { mapActions, mapGetters } from "vuex";
 export default {
   name: "drafts",
@@ -46,11 +43,6 @@ export default {
       this.getDrafts();
       this.showList = true;
     }
-  },
-  components: {
-    Navbar,
-    PostItInfo,
-    Footer
   },
   computed: {
     ...mapGetters(["isLogin"])

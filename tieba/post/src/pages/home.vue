@@ -35,10 +35,6 @@
 </template>
 
 <script>
-import Navbar from "../components/Navbar.vue";
-import PostItInfo from "../components/postItInfo.vue";
-import Footer from "../components/Footer.vue";
-import Floatwindow from "../components/Floatwindow";
 export default {
   name: "home",
   data() {
@@ -48,12 +44,6 @@ export default {
       postList: [],
       page: 1
     };
-  },
-  components: {
-    Navbar,
-    PostItInfo,
-    Floatwindow,
-    Footer
   },
   mounted() {
     this.showPage = true;

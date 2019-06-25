@@ -36,8 +36,6 @@
 </template>
 
 <script>
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer.vue";
 import { mapActions, mapGetters } from "vuex";
 export default {
   name: "login",
@@ -59,10 +57,6 @@ export default {
       },
       submiting: false
     };
-  },
-  components: {
-    Navbar,
-    Footer
   },
   computed: {
     ...mapGetters(["isLogin"])

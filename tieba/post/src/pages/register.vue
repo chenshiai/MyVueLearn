@@ -34,8 +34,6 @@
 </template>
 
 <script>
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer.vue";
 import { mapActions } from "vuex";
 // 这个页面解构与登录页面相同，类名没有变化，数据只有小部分变化，
 export default {
@@ -62,10 +60,6 @@ export default {
       },
       submiting: false
     };
-  },
-  components: {
-    Navbar,
-    Footer
   },
   mounted() {
     this.showLogin = true;
