@@ -28,6 +28,16 @@
               <span class="topic-looknumber">
                 <i class="el-icon-view">{{topic.looknumber ? topic.looknumber : 0}}</i>
               </span>
+              <div class="manage" v-show="topic.user_id==$store.state.userinfo.user_id">
+                <i class="el-icon-more cup"></i>
+                <ul class="manage-list section-card">
+                  <li v-show="$store.state.userinfo.power==0" @click="updatePost(topic)">编辑</li>
+                  <li v-show="$store.state.userinfo.power>0">置顶</li>
+                  <li v-show="$store.state.userinfo.power>0">加精</li>
+                  <li>禁言</li>
+                  <li @click="deleteConfirm">删除</li>
+                </ul>
+              </div>
             </div>
           </div>
           <!-- 帖子内容 -->
@@ -36,65 +46,12 @@
           </div>
         </div>
         <!-- 回复区 -->
-        <div class="allreply">
-          <!-- 回复区头 -->
-          <div class="reply-head">
-            <span>全部回复({{reply.length}})</span>
-            <span class="reply-only">
-              <i class="el-icon-s-custom">只看楼主</i>
-              <i class="el-icon-sort" @click="reverseReply">倒序查看</i>
-            </span>
-          </div>
-          <!-- 回复列表 -->
-          <ul class="reply-list">
-            <li class="reply-item" v-for="(item, index) in reply" :key="index">
-              <div class="repley-detail">
-                <!-- 回复者昵称 -->
-                <div class="reply-user">
-                  {{item.nickname}}
-                  <span class="reply-floor">{{item.index}}楼</span>
-                </div>
-                <!-- 回复时间 -->
-                <div class="reply-time">{{item.created_at}}</div>
-                <!-- 回复内容 -->
-                <div class="reply-content">
-                  <span>{{item.content}}</span>
-                  <span
-                    class="relpy2floor"
-                    @click="sendFloorReply(item, item.id)"
-                    v-show="isLogin&&!noreply"
-                  >
-                    <i class="el-icon-chat-line-round"></i>回复
-                  </span>
-                  <!-- 楼中楼 -->
-                  <ul class="floor-list" v-show="item.replyfloor.length!=0">
-                    <li v-for="(floor, indexf) in item.replyfloor" :key="indexf">
-                      <div class="repley-detail">
-                        <div class="reply-user">
-                          {{floor.nickname}}
-                          <i class="el-icon-caret-right"></i>
-                          {{floor.amisname}}
-                        </div>
-                        <div class="reply-time">{{floor.created_at}}</div>
-                        <div class="reply-content">
-                          <span>{{floor.content}}</span>
-                          <span
-                            class="relpy2floor"
-                            @click="sendFloorReply(floor, item.id)"
-                            v-show="isLogin&&!noreply"
-                          >
-                            <i class="el-icon-chat-line-round"></i>回复
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </li>
-            <li class="reply-status" v-show="zeroreply">暂无回复</li>
-          </ul>
-        </div>
+        <router-view
+          v-if="isRouterAlive"
+          :topicId="topicId"
+          :noreply="noreply"
+          @sendFloorReply="sendFloorReply"
+        />
         <!-- 回复输入框 -->
         <div class="replyarea">
           <div class="reply-head">
@@ -115,6 +72,8 @@
             <div class="replymask" v-show="noreply">该帖被设为禁止回复</div>
           </div>
         </div>
+        <!-- 悬浮窗 -->
+        <Floatwindow :status="true" @sendReply="replyFocus"/>
       </div>
     </div>
     <Footer/>
@@ -125,7 +84,6 @@
 <script>
 import marked from "marked";
 import { mapGetters } from "vuex";
-import API from "../../static/js/global.js";
 export default {
   name: "postPage",
   data() {
@@ -134,13 +92,13 @@ export default {
       topic: {
         tags: []
       },
-      reply: [],
       textarea: "",
       replyObj: {
         floor: 0,
         nickname: "",
         amis: ""
-      }
+      },
+      isRouterAlive: true
     };
   },
   computed: {
@@ -154,10 +112,6 @@ export default {
     // 是否禁止回复
     noreply: function() {
       return this.topic.tags.indexOf("3") >= 0;
-    },
-    // 是否零回复
-    zeroreply: function() {
-      return this.reply.length == 0;
     }
   },
   created() {
@@ -167,8 +121,6 @@ export default {
   mounted() {
     // 获取帖子内容
     this.getTopic();
-    // 获取所有回复
-    this.getReply();
   },
   methods: {
     getTopic: function() {
@@ -177,7 +129,7 @@ export default {
         .post("/api/postlist/topic", { id: this.topicId })
         .then(res => {
           if (res.data.status > 0) {
-            this.topic = API.handleList(res.data.data);
+            this.topic = res.data.data;
             this.replyObj.amis = this.topic.user_id;
           } else {
             this.$message.error(res.data.msg);
@@ -187,41 +139,22 @@ export default {
           this.$message.error("服务器错误，数据获取失败！");
         });
     },
-    getReply: function() {
-      // 获取回复的请求
-      this.axios
-        .post("/api/reply/list", { id: this.topicId })
-        .then(res => {
-          if (res.data.status > 0) {
-            // 从二楼开始
-            let index = 2;
-            this.reply = res.data.data.map(item => {
-              // 对每一项数据进行简单处理
-              let a = API.handleList(item);
-              // 对上层回复添加楼层信息
-              a.index = index++;
-              // 对楼中楼数据进行简单处理
-              a.replyfloor = a.replyfloor.map(item => API.handleList(item))
-              return a;
-            });
-          } else {
-            this.$message.error(res.data.msg);
-          }
-        })
-        .catch(err => {
-          this.$message.error("服务器错误，回复获取失败！");
-        });
-    },
-    sendFloorReply: function(item, floor) {
+    sendFloorReply: function({ item, floor }) {
+      // 接收到被回复的楼层id和用户信息
       this.replyObj.floor = floor;
       this.replyObj.nickname = item.nickname;
       this.replyObj.amis = item.user_id;
-      this.$refs.reply.focus();
+      this.replyFocus();
       this.$message({
         message: `正在向【${item.nickname}】回复`
       });
     },
+    replyFocus: function() {
+      // 聚焦输入框
+      this.$refs.reply.focus();
+    },
     closeFloorReply: function() {
+      // 取消楼层回复
       this.replyObj.floor = 0;
       this.replyObj.nickname = "";
       this.replyObj.amis = this.topic.user_id;
@@ -253,6 +186,7 @@ export default {
               message: "回复成功！"
             });
             // 将新回复显示在页面上未写 直接刷新
+            this.reload();
           } else {
             this.$message.error(res.data.msg);
           }
@@ -262,7 +196,45 @@ export default {
         });
     },
     reverseReply: function() {
+      // 倒序查看回复
       this.reply = this.reply.reverse();
+    },
+    reload() {
+      // 刷新路由
+      this.isRouterAlive = false;
+      this.$nextTick(() => (this.isRouterAlive = true));
+    },
+    deleteConfirm: function() {
+      this.$confirm("即将删除这篇帖子，是否继续?", "帖子删除", {
+        confirmButtonText: "删除",
+        cancelButtonText: "算了",
+        type: "error"
+      })
+        .then(() => {
+          this.deletePost();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除操作..."
+          });
+        });
+    },
+    deletePost: function() {
+      this.axios.post("/api/postlist/delete", this.topic).then(res => {
+        if (res.data.status > 0) {
+          this.$message({
+            type: "success",
+            message: "删除成功！"
+          });
+          this.$router.push({ name: "home" });
+        } else {
+          this.$message({
+            type: "error",
+            message: "删除失败！"
+          });
+        }
+      });
     }
   }
 };

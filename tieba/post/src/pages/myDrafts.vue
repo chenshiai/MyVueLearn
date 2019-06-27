@@ -20,8 +20,6 @@
         </li>
       </ul>
     </transition>
-
-    <Footer/>
   </div>
 </template>
 

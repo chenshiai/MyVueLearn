@@ -7,6 +7,8 @@ import postlist from './postlist.vue'
 import editPost from './editPost.vue'
 import myDrafts from './myDrafts.vue'
 import lookPost from './lookpost.vue'
+import allreply from './allreply.vue'
+
 export {
   login,
   home,
@@ -14,5 +16,6 @@ export {
   postlist,
   editPost,
   myDrafts,
-  lookPost
+  lookPost,
+  allreply
 }

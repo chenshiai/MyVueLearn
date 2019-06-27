@@ -8,7 +8,7 @@
       </span>
       <transition name="list-out" mode="in-out">
         <ul class="sticky-list" v-show="stickyShow">
-          <li class="list-item" v-for="(item, index) in stickys" :key="index">
+          <li class="list-item" v-for="(item, index) in stickyList" :key="index">
             <!-- 帖子内容 -->
             <div class="item-detail">
               <!-- 帖子头 -->
@@ -50,7 +50,7 @@
     <!-- 帖子列表 -->
     <div class="post-list">
       <ul class="normal-list">
-        <li class="list-item" v-for="(item, index) in posts" :key="index">
+        <li class="list-item" v-for="(item, index) in postList" :key="index">
           <!-- 帖子内容 -->
           <div class="item-detail">
             <!-- 楼主 -->
@@ -106,7 +106,6 @@
 </template>
 
 <script>
-import API from "../../static/js/global.js";
 export default {
   name: "postlist",
   props: ["stickyList", "postList"],
@@ -119,19 +118,6 @@ export default {
     retracText: function() {
       return this.stickyShow ? "收起置顶" : "展开置顶";
     },
-    posts: function() {
-      // 对每一项进行深拷贝，防止改变home.vue的值
-      let post = this.postList.map(item=>{
-        return API.deepClone(item);
-      })
-      return post.map(API.handleList);
-    },
-    stickys: function() {
-      let sticky = this.stickyList.map(item=>{
-        return API.deepClone(item);
-      })
-      return sticky.map(API.handleList);
-    }
   },
   methods: {
     stickyRetract: function() {

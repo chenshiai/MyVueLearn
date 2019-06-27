@@ -44,7 +44,10 @@ export default {
   },
   methods: {
     follow: function() {
-      this.$router.push('/login');
+      this.$message({
+        message: '关注功能未完成'
+      })
+      // this.$router.push('/login');
     }
   }
 };

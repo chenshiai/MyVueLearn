@@ -204,7 +204,7 @@ export default {
     createPost: function() {
       // 新建草稿的请求，并获取草稿id
       this.axios
-        .post("/api/publish/init", this.$store.state.userinfo)
+        .post("/api/publish/init")
         .then(res => {
           this.draftsId = res.data.data.id;
           this.$message({

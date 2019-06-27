@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { home, login, register, postlist, editPost,myDrafts, lookPost } from 'pages/'
+import { home, login, register, postlist, editPost,myDrafts, lookPost ,allreply} from 'pages/'
 Vue.use(VueRouter)
 
 const routes = [
@@ -41,11 +41,18 @@ const routes = [
     path: '/topic/:id',
     name: 'lookPost',
     hidden: true,
-    component: lookPost
+    component: lookPost,
+    children:[
+      {
+        path: '/',
+        name: 'allreply',
+        hidden: true,
+        component: allreply
+      }
+    ]
   }
 ]
 
 export default new VueRouter({
-  routes,
-  // strict: process.env.NODE_ENV !== 'production'
+  routes
 })

@@ -1,9 +1,13 @@
 <template>
   <div class="floatwindow">
     <ul class="float-list">
-      <li class="section-card" @click="editPost">
+      <li class="section-card" @click="editPost" v-show="!looking">
         <i class="el-icon-edit-outline"></i>
         <span>发帖</span>
+      </li>
+      <li class="section-card" @click="toReply" v-show="looking">
+        <i class="el-icon-chat-line-round"></i>
+        <span>回复</span>
       </li>
       <li class="section-card" @click="reload">
         <i class="el-icon-refresh"></i>
@@ -26,8 +30,16 @@ import API from "../../static/js/global.js";
 import { mapGetters } from "vuex";
 export default {
   name: "floatwindow",
+  props: ["status"],
   data() {
-    return {};
+    return {
+      looking: false
+    };
+  },
+  created() {
+    if (this.status) {
+      this.looking = this.status;
+    }
   },
   computed: {
     ...mapGetters(["isLogin"])
@@ -44,6 +56,13 @@ export default {
         this.$message.error("发帖功能需要先登录才行哦。");
       } else {
         this.$router.push({ name: "editPost", params: { status: "create" } });
+      }
+    },
+    toReply: function() {
+      if (this.isLogin) {
+        this.$emit("sendReply");
+      } else {
+        this.$message.error('你需要登录才可以回复哦。')
       }
     }
   }

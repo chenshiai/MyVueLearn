@@ -1,7 +1,9 @@
 const API = {
+  // 抛出异常
   error: function (msg) {
     throw new Error(msg);
   },
+  // 防抖对象
   debounce: function (
     abort = error.error('使用debounce，至少传入一个方法'),
     time = 100,
@@ -13,7 +15,7 @@ const API = {
         timer = setTimeout(null, time);
         abort.apply(options.context, args)
       } else if (options.trailing) {
-        timer = setTimeout(() => {
+        timer = setTimeout(function () {
           abort.apply(options.context, args);
           timer = null;
         }, time)
@@ -25,7 +27,8 @@ const API = {
     }
     return process;
   },
-  getCookie: (cname) => {
+  // 获取cookies
+  getCookie: function (cname) {
     var name = cname + "="
     var ca = document.cookie.split(";")
     for (var i = 0; i < ca.length; i++) {
@@ -36,13 +39,15 @@ const API = {
     }
     return null
   },
-  goToTop: () => {
+  // 返回顶部
+  goToTop: function () {
     var currentScroll = API.getScrollTop();
     if (currentScroll > 0) {
       window.requestAnimationFrame(API.goToTop);
       window.scrollTo(0, currentScroll - currentScroll / 5);
     }
   },
+  // 获取滚动条高度
   getScrollTop: function () {
     var scrollTop = 0;
     if (document.documentElement && document.documentElement.scrollTop) {
@@ -52,6 +57,7 @@ const API = {
     }
     return scrollTop;
   },
+  // utc时间转北京时间
   utc2beijing: function (utc_datetime) {
     // 转为正常的时间格式 年-月-日 时:分:秒
     var T_pos = utc_datetime.indexOf('T');
@@ -64,7 +70,6 @@ const API = {
     timestamp = new Date(Date.parse(new_datetime));
     timestamp = timestamp.getTime();
     timestamp = timestamp / 1000;
-
     // 增加8个小时，北京时间比utc时间多八个时区
     var timestamp = timestamp + 8 * 60 * 60;
 

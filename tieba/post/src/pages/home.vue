@@ -18,7 +18,7 @@
               </ul>
             </div>
             <!-- 帖子列表 -->
-            <router-view :stickyList="stickyList" :postList="postList" @deletePost="deletePost"/>
+            <router-view :stickyList="stickyList" :postList="postList" @deletePost="deletePost" v-if="isRouterAlive"/>
             <div style="height: 50px"></div>
           </section>
         </div>
@@ -29,8 +29,7 @@
       </div>
       <!-- 悬浮窗 -->
     </transition>
-    <Floatwindow @reload="reloadPostList"/>
-    <Footer/>
+    <Floatwindow @reload="reload"/>
   </div>
 </template>
 
@@ -42,7 +41,8 @@ export default {
       showPage: false,
       stickyList: [],
       postList: [],
-      page: 1
+      page: 1,
+      isRouterAlive: true
     };
   },
   mounted() {
@@ -53,11 +53,6 @@ export default {
     this.lazyLoadList();
   },
   methods: {
-    reloadPostList: function() {
-      this.$message({
-        message: "正在刷新页面"
-      });
-    },
     getStickyList: function() {
       // 获取置顶帖的请求
       this.axios.get("/api/postlist/sticky").then(res => {
@@ -80,7 +75,14 @@ export default {
     },
     deletePost: function(index){
       this.postList.splice(index, 1);
-    }
+    },
+    reload() {
+      // 刷新路由
+      this.page = 1;
+      this.lazyLoadList();
+      this.isRouterAlive = false;
+      this.$nextTick(() => (this.isRouterAlive = true));
+    },
   }
 };
 </script>

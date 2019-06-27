@@ -31,7 +31,6 @@
         </section>
       </transition>
     </div>
-    <Footer/>
   </div>
 </template>
 
