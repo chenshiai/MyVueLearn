@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/user/
+API文档.md
+Sequelize使用笔记.md
+# Editor directories and files
+.idea
+.vscode
+.env
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
