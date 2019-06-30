@@ -20,7 +20,9 @@
                   class="tag"
                 >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
                 <span class="item-title cup" @click="lookPost(item)">{{item.title}}</span>
+                
               </div>
+              <Postoprating :item="item" :index="index"/>
               <!-- 帖子内容缩略 -->
               <div class="item-summary">{{item.content}}</div>
               <!-- 帖子数据 -->
@@ -56,16 +58,8 @@
             <!-- 楼主 -->
             <div class="item-user">
               <i class="el-icon-edit" title="发布者">{{item.nickname}}</i>
-              <div class="manage" v-show="item.user_id==$store.state.userinfo.user_id">
-                <i class="el-icon-more cup"></i>
-                <ul class="manage-list section-card">
-                  <li v-show="$store.state.userinfo.power==0" @click="updatePost(item)">编辑</li>
-                  <li v-show="$store.state.userinfo.power>0">置顶</li>
-                  <li v-show="$store.state.userinfo.power>0">加精</li>
-                  <li>禁言</li>
-                  <li @click="deleteConfirm(item, index)">删除</li>
-                </ul>
-              </div>
+
+              <Postoprating :item="item" :index="index"/>
             </div>
             <!-- 帖子头 -->
             <div class="item-head">
@@ -117,49 +111,14 @@ export default {
   computed: {
     retracText: function() {
       return this.stickyShow ? "收起置顶" : "展开置顶";
-    },
+    }
   },
   methods: {
     stickyRetract: function() {
       this.stickyShow = !this.stickyShow;
     },
-    deleteConfirm: function(item, index){
-      this.$confirm("即将删除这篇帖子，是否继续?", "帖子删除", {
-        confirmButtonText: "删除",
-        cancelButtonText: "算了",
-        type: "error"
-      })
-        .then(() => {
-          this.deletePost(item, index)
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除操作..."
-          });
-        });
-    },
-    deletePost: function(item, index){
-      this.axios.post('/api/postlist/delete',item).then(res=>{
-        if(res.data.status > 0){
-          this.$message({
-            type: 'success',
-            message: '删除成功！'
-          });
-          this.$emit('deletePost', index);
-        } else {
-          this.$message({
-            type: 'error',
-            message: '删除失败！'
-          })
-        }
-      })
-    },
-    updatePost: function(item){
-       this.$router.push({ name: "editPost", params: { status: "update", postId: item.id , post:item } });
-    },
-    lookPost: function(item){
-      this.$router.push({path:`/topic/${item.id}`})
+    lookPost: function(item) {
+      this.$router.push({ path: `/topic/${item.id}` });
     }
   }
 };
@@ -174,34 +133,6 @@ export default {
 .list-item {
   padding: 10px 20px;
   border-bottom: 1px #868686 solid;
-  .manage {
-    float: right;
-    position: relative;
-    .manage-list {
-      display: none;
-      position: absolute;
-      margin: 0;
-      left: -17px;
-      padding: 5px 0;
-      li {
-        width: 50px;
-        line-height: 20px;
-        text-align: center;
-        cursor: pointer;
-        padding: 2px 0;
-        color: #606266;
-        &:hover {
-          color: #ffc343;
-          background-color: rgb(243, 243, 243);
-        }
-      }
-    }
-    &:hover {
-      .manage-list {
-        display: block;
-      }
-    }
-  }
 }
 .sticky-list {
   .list-item {
