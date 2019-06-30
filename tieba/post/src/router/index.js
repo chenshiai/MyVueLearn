@@ -6,7 +6,6 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'home',
     hidden: true,
     component: home,
     children:[
@@ -39,7 +38,6 @@ const routes = [
     component: myDrafts
   }, {
     path: '/topic/:id',
-    name: 'lookPost',
     hidden: true,
     component: lookPost,
     children:[

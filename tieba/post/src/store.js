@@ -27,8 +27,6 @@ const mutations = {
       nickname: '',
       power: 0
     }
-    document.cookie = 'userinfo='
-    document.cookie = 'token='
   },
   setUserDrafts: (state, drafts) => {
     state.userDrafts = drafts
