@@ -119,7 +119,7 @@ postlist.post('/delete', async (ctx, next) => {
   let timestamp = Tool.getTimestamp()
   // 将被删除的文章插入到recycle表中
   let rec = await db.Recycle.create({
-    topic_id: id, title, content, user_id, tags, created_at:timestamp,updated_at: timestamp
+    topic_id: id, title, content, user_id, tags, created_at: timestamp, updated_at: timestamp
   })
   ctx.body = {
     status: result,
@@ -132,30 +132,66 @@ postlist.post('/delete', async (ctx, next) => {
 postlist.post('/topic', async (ctx, next) => {
   let { id } = ctx.request.body
   let topic = await db.Postlist.findOne({
-    where:{
+    where: {
       id,
     }
   })
   topic = Tool.handleList(topic.dataValues)
-  topic.content = mdit.render(topic.content)
+  topic.MDcontent = mdit.render(topic.content)
   // 浏览量+1
   let lookup = await db.Postlist.update({
     looknumber: ++topic.looknumber
   }, {
-    where:{
-      id
-    },
-    silent: true
-  })
-  if(topic){
+      where: {
+        id
+      },
+      silent: true
+    })
+  if (topic) {
     ctx.body = {
-      status:1,
-      data:topic
+      status: 1,
+      data: topic
     }
-  } else{
+  } else {
     ctx.body = {
-      status:-1,
-      msg:'未找到这篇帖子！'
+      status: -1,
+      msg: '未找到这篇帖子！'
+    }
+  }
+})
+
+// 帖子置顶\加精\禁言等请求操作
+postlist.post('/tagsadd', async (ctx, next) => {
+  let { id, tags, mode, noAdd } = ctx.request.body
+  if (noAdd==undefined) {
+    if (mode === 'sticky') tags.push('1')
+    if (mode === 'essencs') tags.push('2')
+    if (mode === 'banned') tags.push('3')
+  } else {
+    if (mode === 'sticky') tags = tags.filter(tag => tag != '1')
+    if (mode === 'essencs') tags = tags.filter(tag => tag != '2')
+    if (mode === 'banned') tags = tags.filter(tag => tag != '3')
+  }
+
+  let template = Tool.getTimestamp()
+  
+  let result = await db.Postlist.update({
+    tags: tags.join(','),
+    updated_at: template
+  }, {
+      where: {
+        id
+      }
+    })
+  if (result) {
+    ctx.body = {
+      status: 1,
+      msg: '操作成功！'
+    }
+  } else {
+    ctx.body = {
+      status: -1,
+      msg: '操作失败！'
     }
   }
 })
@@ -163,19 +199,19 @@ module.exports = postlist
 /**
  * 1：
  * sequelize自动添加createdAt字段
- * 
+ *
  * 但是为UTC时间
- * 
+ *
  * 2：
  * 前台获取客户机时间，发送给后端接收
- * 
+ *
  * 前后端分离，无法统一
- * 
+ *
  * 3：
  * 后端添加时间戳函数
  * 在更新和插入数据的时候调用
  * 生成服务机的时间插入
  * 数据格式为字符串
- * 
+ *
  */
 // 数据创建更新时间规范方法
