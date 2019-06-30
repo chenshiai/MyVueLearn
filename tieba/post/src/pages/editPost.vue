@@ -3,12 +3,12 @@
     <!-- 编辑帖子头 -->
     <div class="post-head">
       <div class="post-title">
-        <input type="text" placeholder="输入帖子标题..." v-model="postInfo.title">
+        <input type="text" placeholder="输入帖子标题..." v-model="postInfo.title" @input="changeContent">
       </div>
       <!-- 用户工具 -->
       <div class="user-controller">
         <!-- 草稿箱 -->
-        <div class="drafts">
+        <div class="drafts" v-show="!updating">
           <span v-if="autoSave">正在保存至</span>
           <span v-else>已经自动保存至</span>
           <i class="el-icon-document cup" @click="myDrafts">草稿</i>
@@ -40,6 +40,7 @@ export default {
     return {
       autoSave: false,
       draftsId: "",
+      updating:false,
       postInfo: {
         content: "",
         title: ""
@@ -103,6 +104,7 @@ export default {
           type: "success",
           message: "读取成功，可以开始编辑了！"
         });
+        this.updating = true;
       } else {
         this.$message.error("出现错误，请在首页进行反馈，谢谢！");
       }
@@ -206,11 +208,16 @@ export default {
       this.axios
         .post("/api/publish/init")
         .then(res => {
-          this.draftsId = res.data.data.id;
-          this.$message({
-            type: "success",
-            message: "已添加至草稿箱中。"
-          });
+          if (res.data.status > 0) {
+            this.draftsId = res.data.data.id;
+            this.$message({
+              type: "success",
+              message: "已添加至草稿箱中。"
+            });
+          } else {
+            this.$message.error(res.data.msg);
+            this.$router.push('/');
+          }
         })
         .catch(res => {
           this.$message.error("服务器错误，新建帖子失败！");

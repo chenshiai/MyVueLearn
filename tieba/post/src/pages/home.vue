@@ -18,7 +18,7 @@
               </ul>
             </div>
             <!-- 帖子列表 -->
-            <router-view :stickyList="stickyList" :postList="postList" @deletePost="deletePost" v-if="isRouterAlive"/>
+            <router-view :stickyList="stickyList" :postList="postList" @deletePost="deletePost"/>
             <div style="height: 50px"></div>
           </section>
         </div>
@@ -29,7 +29,7 @@
       </div>
       <!-- 悬浮窗 -->
     </transition>
-    <Floatwindow @reload="reload"/>
+    <Floatwindow/>
   </div>
 </template>
 
@@ -41,8 +41,7 @@ export default {
       showPage: false,
       stickyList: [],
       postList: [],
-      page: 1,
-      isRouterAlive: true
+      page: 1
     };
   },
   mounted() {
@@ -61,6 +60,8 @@ export default {
         } else {
           this.$message.error(res.data.msg);
         }
+      }).catch(()=>{
+        this.$message.error('服务器错误，置顶帖获取失败！');
       });
     },
     lazyLoadList: function() {
@@ -71,18 +72,13 @@ export default {
         } else {
           this.$message.error(res.data.msg);
         }
+      }).catch(()=>{
+        this.$message.error('服务器错误，帖子获取失败！');
       });
     },
     deletePost: function(index){
       this.postList.splice(index, 1);
-    },
-    reload() {
-      // 刷新路由
-      this.page = 1;
-      this.lazyLoadList();
-      this.isRouterAlive = false;
-      this.$nextTick(() => (this.isRouterAlive = true));
-    },
+    }
   }
 };
 </script>

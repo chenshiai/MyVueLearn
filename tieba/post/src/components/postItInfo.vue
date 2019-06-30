@@ -11,8 +11,8 @@
         <div class="post-introduction">{{ postInfo.introduction }}</div>
         <div class="post-user-numbar">{{ postInfo.usernumber }}人关注</div>
         <div class="post-number">{{ postInfo.postnumber }} 篇帖子</div>
-        <div :class="isLogin?'follow followed':'follow nofollow'" @click="follow">
-          <span v-show="!isLogin">
+        <div :class="isLogin?'follow followed':'follow nofollow'">
+          <span v-show="!isLogin"  @click="follow">
             <i class="el-icon-star-on"></i>加入本吧
           </span>
           <span v-show="isLogin">
@@ -31,11 +31,11 @@ export default {
   data() {
     return {
       postInfo: {
-        postname: "旅梦开发团吧",
+        postname: "来吧",
         introduction:
-          "欢迎来到旅梦开发团吧，在这里你可以和大家一起学习新的技术、分享自己的心得",
-        usernumber: 108,
-        postnumber: 23040
+          "欢迎来到“来吧”，在这里你可以和大家一起学习新的技术、分享自己的心得",
+        usernumber: 0,
+        postnumber: 0
       }
     };
   },
@@ -44,10 +44,10 @@ export default {
   },
   methods: {
     follow: function() {
-      this.$message({
-        message: '关注功能未完成'
-      })
-      // this.$router.push('/login');
+      // this.$message({
+      //   message: '关注功能未完成'
+      // })
+      this.$router.push('/login');
     }
   }
 };

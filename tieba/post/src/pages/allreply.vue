@@ -5,7 +5,7 @@
       <span>全部回复({{reply.length}})</span>
       <span class="reply-only">
         <i class="el-icon-s-custom">只看楼主</i>
-        <i class="el-icon-sort" @click="reverseReply">倒序查看</i>
+        <i class="el-icon-sort cup" @click="reverseReply">倒序查看</i>
       </span>
     </div>
     <!-- 回复列表 -->
@@ -90,15 +90,7 @@ export default {
           if (res.data.status > 0) {
             // 从二楼开始
             let index = 2;
-            this.reply = res.data.data.map(item => {
-              // 对每一项数据进行简单处理
-              let a = API.handleList(item);
-              // 对上层回复添加楼层信息
-              a.index = index++;
-              // 对楼中楼数据进行简单处理
-              a.replyfloor = a.replyfloor.map(item => API.handleList(item));
-              return a;
-            });
+            this.reply = res.data.data;
           } else {
             this.$message.error(res.data.msg);
           }

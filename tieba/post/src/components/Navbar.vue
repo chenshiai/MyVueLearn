@@ -59,18 +59,28 @@ export default {
   },
   mounted() {
     let that = this;
-    let userinfo = API.getCookie("userinfo");
-    if (userinfo) {
-      let user = userinfo.split("_");
-      let nickname = user[0];
-      let user_id = user[1];
-      let power = user[2];
-      that.userLogin({
-        nickname,
-        user_id,
-        power
-      });
+    if (!this.isLogin) {
+      // 如果用户处于未登录状态，则把token发给服务端校验
+      // 服务端再返回该用户的信息设置在vuex中
+      this.axios
+        .post("/api/autologin/check")
+        .then(res => {
+          if (res.data.status > 0) {
+            let nickname = res.data.data.nickname;
+            let user_id = res.data.data.user_id;
+            let power = res.data.data.power;
+            that.userLogin({
+              nickname,
+              user_id,
+              power
+            });
+          }
+        })
+        .catch(() => {
+          this.$message.error("自动登录出现错误！");
+        });
     }
+
     return null;
   },
   methods: {
@@ -78,9 +88,24 @@ export default {
     undone: function() {
       this.$message.error("该功能尚未实现");
     },
-    outLogin: function(){
-      this.$router.push('/');
+    outLogin: function() {
+      this.$router.push("/");
       this.cancelLogin();
+      this.axios
+        .post("/api/login/out")
+        .then(res => {
+          if (res.data.status > 0) {
+            this.$message({
+              type: "success",
+              message: "已退出登录。"
+            });
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(() => {
+          this.$message.error("出现错误，可以到首页进行反馈。");
+        });
     },
     lookPost: function() {
       this.$router.push("/");
@@ -97,8 +122,8 @@ export default {
     lookMyself: function() {
       this.$message.error("个人中心功能未实现");
     },
-    myDrafts: function(){
-      this.$router.push('/user/mydrafts')
+    myDrafts: function() {
+      this.$router.push("/user/mydrafts");
     }
   }
 };

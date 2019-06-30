@@ -28,26 +28,16 @@
               <span class="topic-looknumber">
                 <i class="el-icon-view">{{topic.looknumber ? topic.looknumber : 0}}</i>
               </span>
-              <div class="manage" v-show="topic.user_id==$store.state.userinfo.user_id">
-                <i class="el-icon-more cup"></i>
-                <ul class="manage-list section-card">
-                  <li v-show="$store.state.userinfo.power==0" @click="updatePost(topic)">编辑</li>
-                  <li v-show="$store.state.userinfo.power>0">置顶</li>
-                  <li v-show="$store.state.userinfo.power>0">加精</li>
-                  <li>禁言</li>
-                  <li @click="deleteConfirm">删除</li>
-                </ul>
-              </div>
+              <Postoprating :item="topic"/>
             </div>
           </div>
           <!-- 帖子内容 -->
           <div class="topic-content">
-            <div v-html="MDcontent"></div>
+            <div v-html="topic.MDcontent"></div>
           </div>
         </div>
         <!-- 回复区 -->
         <router-view
-          v-if="isRouterAlive"
           :topicId="topicId"
           :noreply="noreply"
           @sendFloorReply="sendFloorReply"
@@ -73,7 +63,7 @@
           </div>
         </div>
         <!-- 悬浮窗 -->
-        <Floatwindow :status="true" @sendReply="replyFocus"/>
+        <Floatwindow :status="true"/>
       </div>
     </div>
     <Footer/>
@@ -97,8 +87,7 @@ export default {
         floor: 0,
         nickname: "",
         amis: ""
-      },
-      isRouterAlive: true
+      }
     };
   },
   computed: {
@@ -186,7 +175,6 @@ export default {
               message: "回复成功！"
             });
             // 将新回复显示在页面上未写 直接刷新
-            this.reload();
           } else {
             this.$message.error(res.data.msg);
           }
@@ -199,43 +187,6 @@ export default {
       // 倒序查看回复
       this.reply = this.reply.reverse();
     },
-    reload() {
-      // 刷新路由
-      this.isRouterAlive = false;
-      this.$nextTick(() => (this.isRouterAlive = true));
-    },
-    deleteConfirm: function() {
-      this.$confirm("即将删除这篇帖子，是否继续?", "帖子删除", {
-        confirmButtonText: "删除",
-        cancelButtonText: "算了",
-        type: "error"
-      })
-        .then(() => {
-          this.deletePost();
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除操作..."
-          });
-        });
-    },
-    deletePost: function() {
-      this.axios.post("/api/postlist/delete", this.topic).then(res => {
-        if (res.data.status > 0) {
-          this.$message({
-            type: "success",
-            message: "删除成功！"
-          });
-          this.$router.push({ name: "home" });
-        } else {
-          this.$message({
-            type: "error",
-            message: "删除失败！"
-          });
-        }
-      });
-    }
   }
 };
 </script>
