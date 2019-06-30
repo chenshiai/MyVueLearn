@@ -63,7 +63,8 @@ reply.post('/add', async (ctx, next) => {
     updated_at: timestamp
   })
   let replyup = await db.Postlist.update({
-    replynumber: ++replynumber
+    replynumber: ++replynumber,
+    updated_at: timestamp
   }, {
       where: {
         id: topic_id

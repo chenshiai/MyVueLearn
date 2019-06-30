@@ -6,6 +6,7 @@ module.exports = {
     /^\/api\/postlist\/page/,
     /^\/api\/postlist\/sticky/,
     /^\/api\/postlist\/topic/,
+    /^\/api\/reply\/list/,
     /^((?!\/api).)*$/ // 设置除了私有接口外的其它资源，可以不需要认证访问
   ]
 }
