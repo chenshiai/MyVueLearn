@@ -11,6 +11,7 @@
           </div>
           <div class="detail">
             <div class="update-time">
+              <i class="el-icon-time"></i>
               <span>{{item.updated_at}}</span>
             </div>
           </div>

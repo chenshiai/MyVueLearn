@@ -2,64 +2,67 @@
   <div>
     <!-- 置顶帖 -->
     <div class="post-sticky">
-      <span @click="stickyRetract" class="stickyRetract cup">
-        {{retracText}}
-        <i :class="stickyShow ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"></i>
-      </span>
-      <transition name="list-out" mode="in-out">
-        <ul class="sticky-list" v-show="stickyShow">
-          <li class="list-item" v-for="(item, index) in stickyList" :key="index">
-            <!-- 帖子内容 -->
-            <div class="item-detail">
-              <!-- 帖子头 -->
-              <div class="item-head">
-                <!-- 帖子标签 -->
-                <span
-                  v-for="(tag, index) in item.tags"
-                  :key="index"
-                  class="tag"
-                >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
-                <span class="item-title cup" @click="lookPost(item)">{{item.title}}</span>
-                
-              </div>
+      <el-collapse v-model="activeNames" @change="stickyRetract">
+        <el-collapse-item name="1">
+          <template slot="title">
+            <div class="retracText">{{retracText}}</div>
+          </template>
+          <ul class="sticky-list">
+            <li class="list-item" v-for="(item, index) in stickyList" :key="index">
+              <!-- 帖子内容 -->
               <Postoprating :item="item" :index="index"/>
-              <!-- 帖子内容缩略 -->
-              <div class="item-summary">{{item.content}}</div>
-              <!-- 帖子数据 -->
-              <div class="item-all">
-                <!-- 楼主 -->
-                <div class="item-user">
-                  <i class="el-icon-edit" title="发布者">{{item.nickname}}</i>
+              <div class="item-detail">
+                <!-- 帖子头 -->
+                <div class="item-head">
+                  <!-- 帖子标签 -->
+                  <span
+                    v-for="(tag, index) in item.tags"
+                    :key="index"
+                    class="tag"
+                  >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
+                  <span class="item-title cup" @click="lookPost(item)">{{item.title}}</span>
+                  
                 </div>
-                <div class="item-time" title="发布时间">
-                  <i class="el-icon-date"></i>
-                  {{item.updated_at}}
-                </div>
-                <div class="item-clicknumber" title="浏览量">
-                  <i class="el-icon-view"></i>
-                  {{item.looknumber ? item.looknumber : 0}}
-                </div>
-                <div class="item-reply" title="回复量">
-                  <i class="el-icon-chat-dot-round"></i>
-                  {{item.replynumber ? item.replynumber : 0}}
+                
+                <!-- 帖子内容缩略 -->
+                <div class="item-summary">{{item.content}}</div>
+                <!-- 帖子数据 -->
+                <div class="item-all">
+                  <!-- 楼主 -->
+                  <div class="item-user">
+                    <i class="el-icon-edit" title="发布者">{{item.nickname}}</i>
+                  </div>
+                  <div class="item-time" title="活跃时间">
+                    <i class="el-icon-time"></i>
+                    {{item.updated_at}}
+                  </div>
+                  <div class="item-clicknumber" title="浏览量">
+                    <i class="el-icon-view"></i>
+                    {{item.looknumber ? item.looknumber : 0}}
+                  </div>
+                  <div class="item-reply" title="回复量">
+                    <i class="el-icon-chat-dot-round"></i>
+                    {{item.replynumber ? item.replynumber : 0}}
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        </ul>
-      </transition>
+            </li>
+          </ul>
+        </el-collapse-item>
+      </el-collapse>
     </div>
     <!-- 帖子列表 -->
     <div class="post-list">
       <ul class="normal-list">
         <li class="list-item" v-for="(item, index) in postList" :key="index">
           <!-- 帖子内容 -->
+          <Postoprating :item="item" :index="index"/>
           <div class="item-detail">
             <!-- 楼主 -->
             <div class="item-user">
               <i class="el-icon-edit" title="发布者">{{item.nickname}}</i>
 
-              <Postoprating :item="item" :index="index"/>
+              
             </div>
             <!-- 帖子头 -->
             <div class="item-head">
@@ -79,8 +82,8 @@
             </div>
             <!-- 帖子数据 -->
             <div class="item-all">
-              <div class="item-time" title="发布时间">
-                <i class="el-icon-date"></i>
+              <div class="item-time" title="活跃时间">
+                <i class="el-icon-time"></i>
                 {{item.updated_at}}
               </div>
               <div class="item-clicknumber" title="浏览量">
@@ -105,7 +108,8 @@ export default {
   props: ["stickyList", "postList"],
   data() {
     return {
-      stickyShow: true
+      stickyShow: true,
+      activeNames: ["1"]
     };
   },
   computed: {
@@ -129,6 +133,11 @@ export default {
   margin-left: 20px;
   line-height: 30px;
   color: #606266;
+}
+.retracText{
+  padding-left: 20px;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 .list-item {
   padding: 10px 20px;
@@ -244,5 +253,10 @@ export default {
 .list-out-leave-to {
   transform: scale(0, 0);
   opacity: 0;
+}
+</style>
+<style>
+.el-collapse-item__wrap{
+  overflow:visible;
 }
 </style>

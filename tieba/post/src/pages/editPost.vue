@@ -26,7 +26,13 @@
     <div style="height: 62px;"></div>
     <!-- 帖子内容 -->
     <div class="post-content">
-      <mavon-editor v-model="postInfo.content" :toolbars="toolbars" @change="changeContent"/>
+      <mavon-editor
+        ref="md"
+        @imgAdd="imgAdd"
+        v-model="postInfo.content"
+        :toolbars="toolbars"
+        @change="changeContent"
+      />
     </div>
   </div>
 </template>
@@ -40,7 +46,7 @@ export default {
     return {
       autoSave: false,
       draftsId: "",
-      updating:false,
+      updating: false,
       postInfo: {
         content: "",
         title: ""
@@ -55,7 +61,7 @@ export default {
         quote: true, // 引用
         ol: true, // 有序列表
         ink: true, // 链接
-        imagelink: false, // 图片链接
+        imagelink: true, // 图片链接
         help: true, // 帮助
         code: true, // code
         subfield: true, // 是否需要分栏
@@ -216,7 +222,7 @@ export default {
             });
           } else {
             this.$message.error(res.data.msg);
-            this.$router.push('/');
+            this.$router.push("/");
           }
         })
         .catch(res => {
@@ -250,6 +256,30 @@ export default {
         // 如果没有参数进来
         this.$message.error("出现错误，请在首页进行反馈，谢谢！");
       }
+    },
+    imgAdd: function (pos, file) {
+      // 上传图片
+      var formData = new FormData();
+      formData.append("image", file);
+      console.log(formData)
+      this.axios({
+        url: '/api/user/img/upload', //请求地址
+        method: "post",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" }
+      }).then(url => {
+        // console.log(JSON.stringify(url))
+        // 第二步.将返回的url替换到文本原位置![...](./0) -> ![...](url)
+        /**
+         * $vm 指为mavonEditor实例，可以通过如下两种方式获取
+         * 1.  通过引入对象获取: `import {mavonEditor} from ...` 等方式引入后，`$vm`为`mavonEditor`
+         * 2. 通过$refs获取: html声明ref : `<mavon-editor ref=md ></mavon-editor>，`$vm`为 `this.$refs.md`
+         * 3. 由于vue运行访问的路径只能在static下，so，我就把图片保存到它这里了
+         */
+        this.$refs.md.$img2Url(
+          pos,"http://localhost:3000"+url.data.data
+        );
+      });
     }
   }
 };

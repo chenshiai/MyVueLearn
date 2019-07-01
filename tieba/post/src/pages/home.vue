@@ -24,7 +24,7 @@
         </div>
         <!-- 右边侧栏 -->
         <div class="content-right">
-          <section class="section-card">右边</section>
+          <Right/>
         </div>
       </div>
       <!-- 悬浮窗 -->
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import API from "../../static/js/global";
 export default {
   name: "home",
   data() {
@@ -50,34 +51,53 @@ export default {
     this.getStickyList();
     // 请求一页非置顶帖子
     this.lazyLoadList();
+    let dec = API.debounce(this.loadmore, 500);
+    window.onscroll= dec;
   },
   methods: {
     getStickyList: function() {
       // 获取置顶帖的请求
-      this.axios.get("/api/postlist/sticky").then(res => {
-        if (res.data.status > 0) {
-          this.stickyList = res.data.data;
-        } else {
-          this.$message.error(res.data.msg);
-        }
-      }).catch(()=>{
-        this.$message.error('服务器错误，置顶帖获取失败！');
-      });
+      this.axios
+        .get("/api/postlist/sticky")
+        .then(res => {
+          if (res.data.status > 0) {
+            this.stickyList = res.data.data;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(() => {
+          this.$message.error("服务器错误，置顶帖获取失败！");
+        });
     },
     lazyLoadList: function() {
       // 根据page分页获取
-      this.axios.post("/api/postlist/page", { page: this.page }).then(res => {
-        if (res.data.status > 0) {
-          this.postList = [...this.postList,...res.data.data];
-        } else {
-          this.$message.error(res.data.msg);
-        }
-      }).catch(()=>{
-        this.$message.error('服务器错误，帖子获取失败！');
-      });
+      this.axios
+        .post("/api/postlist/page", { page: this.page })
+        .then(res => {
+          if (res.data.status > 0) {
+            this.postList = [...this.postList, ...res.data.data];
+            if (res.data.data.length > 0) {
+              this.page++;
+            }
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(() => {
+          this.$message.error("服务器错误，帖子获取失败！");
+        });
     },
-    deletePost: function(index){
+    deletePost: function(index) {
       this.postList.splice(index, 1);
+    },
+    // 滚动到底部加载更多
+    loadmore: function() {
+      let url = window.location.href.split("/").pop();
+      if (url == "" && API.isbuttom()) {
+        this.lazyLoadList();
+        console.log(url);
+      }
     }
   }
 };

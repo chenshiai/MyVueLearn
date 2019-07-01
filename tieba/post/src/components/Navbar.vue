@@ -2,9 +2,9 @@
   <div class="head">
     <div class="container">
       <div class="nav-bar">
-        <div class="nav-bar-logo">LOGO</div>
+        <div class="nav-bar-logo">LaiBA</div>
         <ul class="nav-bar-list">
-          <li class="list-item" @click="lookPost">看帖</li>
+          <li class="list-item" @click="lookPost">看吧</li>
           <li class="list-item">热门</li>
           <li class="list-item">精品</li>
         </ul>
@@ -26,6 +26,7 @@
                   </ul>
                 </div>
               </transition>
+              
             </div>
           </div>
           <div class="login" v-show="!isLogin">
@@ -76,9 +77,6 @@ export default {
             });
           }
         })
-        .catch(() => {
-          this.$message.error("自动登录出现错误！");
-        });
     }
 
     return null;
@@ -177,11 +175,13 @@ export default {
           line-height: 30px;
           width: 100%;
           margin-top: 10px;
+          z-index: 99;
           ul {
             position: relative;
             padding: 10px 0;
             li {
               cursor: pointer;
+              font-size: 0.8rem;
               &:hover {
                 color: #ffc343;
                 background-color: rgb(243, 243, 243);

@@ -2,9 +2,9 @@
   <div class="allreply">
     <!-- 回复区头 -->
     <div class="reply-head">
-      <span>全部回复({{reply.length}})</span>
+      <span>全部回复({{maxlength}})</span>
       <span class="reply-only">
-        <i class="el-icon-s-custom">只看楼主</i>
+        <!-- <i class="el-icon-s-custom">只看楼主</i> -->
         <i class="el-icon-sort cup" @click="reverseReply">倒序查看</i>
       </span>
     </div>
@@ -21,14 +21,16 @@
           <div class="reply-time">{{item.created_at}}</div>
           <!-- 回复内容 -->
           <div class="reply-content">
-            <span>{{item.content}}</span>
-            <span
+            <div>{{item.content}}</div>
+            <div
               class="relpy2floor"
               @click="sendFloorReply(item, item.id)"
               v-show="isLogin&&!noreply"
             >
-              <i class="el-icon-chat-line-round"></i>回复
-            </span>
+              <span class="cup">
+                <i class="el-icon-chat-line-round"></i>回复
+              </span>
+            </div>
             <!-- 楼中楼 -->
             <ul class="floor-list" v-show="item.replyfloor.length!=0">
               <li v-for="(floor, indexf) in item.replyfloor" :key="indexf">
@@ -40,14 +42,16 @@
                   </div>
                   <div class="reply-time">{{floor.created_at}}</div>
                   <div class="reply-content">
-                    <span>{{floor.content}}</span>
-                    <span
+                    <div>{{floor.content}}</div>
+                    <div
                       class="relpy2floor"
                       @click="sendFloorReply(floor, item.id)"
                       v-show="isLogin&&!noreply"
                     >
-                      <i class="el-icon-chat-line-round"></i>回复
-                    </span>
+                      <span class="cup">
+                        <i class="el-icon-chat-line-round"></i>回复
+                      </span>
+                    </div>
                   </div>
                 </div>
               </li>
@@ -57,6 +61,7 @@
       </li>
       <li class="reply-status" v-show="zeroreply">暂无回复</li>
     </ul>
+    <div class="loadmore cup" @click="pageOfReply.lazyload(5)" v-show="maxlength>reply.length">加载更多</div>
   </div>
 </template>
 
@@ -65,14 +70,17 @@ import API from "../../static/js/global.js";
 import { mapGetters } from "vuex";
 export default {
   name: "allreply",
-  props: ["topicId","noreply"],
+  props: ["topicId", "noreply"],
   data() {
     return {
-      reply: []
+      pageOfReply: () => {},
+      reply: [],
+      maxlength: 0,
+      reverse: true // 是否时间倒序
     };
   },
   created() {
-    this.getReply();
+    this.getReply(true);
   },
   computed: {
     ...mapGetters(["isLogin"]),
@@ -85,12 +93,15 @@ export default {
     getReply: function() {
       // 获取回复的请求
       this.axios
-        .post("/api/reply/list", { id: this.topicId })
+        .post("/api/reply/list", { id: this.topicId, reverse: this.reverse })
         .then(res => {
           if (res.data.status > 0) {
-            // 从二楼开始
-            let index = 2;
-            this.reply = res.data.data;
+            // 因为后端数据库设计问题，分页交给前端来处理
+            this.maxlength = res.data.data.length;
+            this.pageOfReply = new API.Taglazyload(res.data.data, data => {
+              this.reply.push(data);
+            });
+            this.pageOfReply.lazyload(5);
           } else {
             this.$message.error(res.data.msg);
           }
@@ -100,11 +111,15 @@ export default {
         });
     },
     reverseReply: function() {
-      this.reply = this.reply.reverse();
+      this.reverse = !this.reverse;
+      this.pageOfReply = () => {};
+      this.reply = [];
+      this.maxlength = 0;
+      this.getReply();
     },
     sendFloorReply: function(item, floor) {
-      this.$emit('sendFloorReply', {item, floor});
-    },
+      this.$emit("sendFloorReply", { item, floor });
+    }
   }
 };
 </script>
@@ -151,17 +166,25 @@ export default {
     .reply-content {
       margin-top: 10px;
       padding-left: 40px;
-      span {
-        display: block;
-        margin-bottom: 10px;
-      }
       i {
         margin-right: 5px;
       }
       .relpy2floor {
         color: #909399;
         font-size: 0.8rem;
+        margin-bottom: 10px;
       }
+    }
+  }
+  .loadmore {
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    border: solid 1px;
+    &:hover {
+      color: #ffc343;
+
+      background-color: #ffc34350;
     }
   }
 }

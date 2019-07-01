@@ -3,7 +3,7 @@
     <div class="post-it-info">
       <!-- 本吧logo -->
       <div class="post-logo">
-        <img src="../assets/logo.png" alt>
+        <img src="../assets/mylogo.png" alt>
       </div>
       <!-- 本吧详情 -->
       <div class="post-detail">

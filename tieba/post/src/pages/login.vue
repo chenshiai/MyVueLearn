@@ -20,7 +20,7 @@
             <el-form-item prop="password">
               <el-input
                 class="area"
-                type="password"
+                 show-password
                 placeholder="输入你的密码"
                 v-model="loginForm.password"
               />

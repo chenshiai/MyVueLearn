@@ -15,10 +15,13 @@
             <el-form-item prop="password">
               <el-input
                 class="area"
-                type="password"
                 placeholder="输入你的密码"
+                show-password
                 v-model="loginForm.password"
               />
+            </el-form-item>
+            <el-form-item prop="checkPass">
+              <el-input type="password" v-model="loginForm.checkPass" placeholder="确认你的密码" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item prop="nickname">
               <el-input class="area" type="text" placeholder="输入你的昵称" v-model="loginForm.nickname"/>
@@ -38,20 +41,41 @@ import { mapActions } from "vuex";
 export default {
   name: "regiser",
   data() {
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.loginForm.checkPass !== "") {
+          this.$refs.loginForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.loginForm.password) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       showLogin: false,
       ip: "",
       loginForm: {
         username: "",
         password: "",
-        nickname: ""
+        nickname: "",
+        checkPass: ""
       },
       rules: {
         username: [
           { required: true, message: "请给自己一个账号", trigger: "blur" },
           { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
         ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        password: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
         nickname: [
           { required: true, message: "真的要叫你无名氏吗？", trigger: "blur" },
           { min: 2, max: 20, message: "长度在 2 到 20 个字符", trigger: "blur" }
@@ -72,26 +96,29 @@ export default {
       this.submiting = true;
       this.$refs["loginForm"].validate(valid => {
         if (valid) {
-          this.axios.post("/api/register", this.loginForm).then(res => {
-            if (res.data.status > 0) {
-              this.$message({
-                message: "注册成功！已自动登录。",
-                type: "success"
-              });
-              this.userLogin(res.data.data);
-              this.$router.push("/");
-            } else {
-              this.loginForm.username = "";
-              this.loginForm.password = "";
-              this.$message.error(res.data.msg);
+          this.axios
+            .post("/api/register", this.loginForm)
+            .then(res => {
+              if (res.data.status > 0) {
+                this.$message({
+                  message: "注册成功！已自动登录。",
+                  type: "success"
+                });
+                this.userLogin(res.data.data);
+                this.$router.push("/");
+              } else {
+                this.loginForm.username = "";
+                this.loginForm.password = "";
+                this.$message.error(res.data.msg);
+                this.submiting = false;
+              }
+            })
+            .catch(err => {
+              this.$message.error("服务器错误，注册失败！");
               this.submiting = false;
-            }
-          }).catch(err=>{
-            this.$message.error('服务器错误，注册失败！');
-            this.submiting = false;
-          });
+            });
         } else {
-        this.submiting = false;
+          this.submiting = false;
         }
       });
     }

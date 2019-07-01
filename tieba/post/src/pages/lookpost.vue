@@ -1,83 +1,90 @@
 <template>
   <div class="post-page">
     <Navbar/>
-    <div class="container">
-      <div class="content-left">
-        <!-- 帖子详情 -->
-        <div class="topic">
-          <!-- 帖子头 -->
-          <div class="topic-head">
-            <!-- 标题 -->
-            <div class="topic-title">{{topic.title}}</div>
-            <!-- 标签 -->
-            <div class="topic-tags">
-              <span
-                v-for="(tag, index) in topic.tags"
-                :key="index"
-                class="tag"
-              >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
+    <transition name="form-fade" mode="in-out">
+      <div class="container" v-show="showPage">
+        <div class="content-left section-card topic-left">
+          <!-- 帖子详情 -->
+          <div class="topic">
+            <!-- 帖子头 -->
+            <div class="topic-head">
+              <!-- 标题 -->
+              <div class="topic-title">{{topic.title}}</div>
+              <!-- 标签 -->
+              <div class="topic-tags">
+                <span
+                  v-for="(tag, index) in topic.tags"
+                  :key="index"
+                  class="tag"
+                >{{tag==1?'置顶':tag==2?'精华':tag==3?'禁言':''}}</span>
+              </div>
+              <!-- 帖子信息 -->
+              <div class="topic-all">
+                <span class="topic-user" title="楼主">
+                  <i class="el-icon-user-solid">{{topic.nickname}}</i>
+                </span>
+                <span class="topic-time" title="发表时间">
+                  <i class="el-icon-time">{{topic.created_at}}</i>
+                </span>
+                <span class="topic-looknumber" title="浏览量">
+                  <i class="el-icon-view">{{topic.looknumber ? topic.looknumber : 0}}</i>
+                </span>
+                <Postoprating :item="topic"/>
+              </div>
             </div>
-            <!-- 帖子信息 -->
-            <div class="topic-all">
-              <span class="topic-user">
-                <i class="el-icon-user-solid">{{topic.nickname}}</i>
-              </span>
-              <span class="topic-time">
-                <i class="el-icon-date">{{topic.created_at}}</i>
-              </span>
-              <span class="topic-looknumber">
-                <i class="el-icon-view">{{topic.looknumber ? topic.looknumber : 0}}</i>
-              </span>
-              <Postoprating :item="topic"/>
-            </div>
+            <!-- 帖子内容 -->
+            <Topic :topic="topic"/>
           </div>
-          <!-- 帖子内容 -->
-          <div class="topic-content">
-            <div v-html="topic.MDcontent"></div>
+          <!-- 回复区 -->
+          <router-view :topicId="topicId" :noreply="noreply" @sendFloorReply="sendFloorReply"/>
+          <!-- 回复输入框 -->
+          <div class="replyarea">
+            <div class="reply-head">
+              <span>发表回复</span>
+            </div>
+            <div class="input">
+              <el-input
+                type="textarea"
+                :rows="7"
+                placeholder="请输入内容"
+                v-model="textarea"
+                ref="reply"
+                maxlength="200"
+                show-word-limit
+              ></el-input>
+              <div @click="sendReply" class="sendReply cup">
+                <span v-if="replyObj.floor==0">向楼主回复</span>
+                <span v-else>向{{replyObj.nickname}}回复</span>
+              </div>
+              <div @click="closeFloorReply" v-show="replyObj.floor!=0" class="sendReply cup">取消</div>
+              <div class="replymask" v-show="!isLogin&&!noreply">
+                你需要登录才可以回复
+                <router-link :to="{ path: '/login', query: { id: topicId } }">登录</router-link>|
+                <router-link to="/register">立即注册</router-link>
+              </div>
+              <div class="replymask" v-show="noreply">该帖被设为禁止回复</div>
+            </div>
           </div>
         </div>
-        <!-- 回复区 -->
-        <router-view
-          :topicId="topicId"
-          :noreply="noreply"
-          @sendFloorReply="sendFloorReply"
-        />
-        <!-- 回复输入框 -->
-        <div class="replyarea">
-          <div class="reply-head">
-            <span>发表回复</span>
-          </div>
-          <div class="input">
-            <el-input type="textarea" :rows="7" placeholder="请输入内容" v-model="textarea" ref="reply"></el-input>
-            <el-button @click="sendReply">
-              <span v-if="replyObj.floor==0">向楼主回复</span>
-              <span v-else>向{{replyObj.nickname}}回复</span>
-            </el-button>
-            <el-button @click="closeFloorReply" v-show="replyObj.floor!=0">取消</el-button>
-            <div class="replymask" v-show="!isLogin&&!noreply">
-              你需要登录才可以回复
-              <router-link :to="{ path: '/login', query: { id: topicId } }">登录</router-link>|
-              <router-link to="/register">立即注册</router-link>
-            </div>
-            <div class="replymask" v-show="noreply">该帖被设为禁止回复</div>
-          </div>
+        <div class="content-right">
+          <Right/>
         </div>
-        <!-- 悬浮窗 -->
-        <Floatwindow :status="true"/>
       </div>
-    </div>
-    <Footer/>
-    <div class="mask"></div>
+    </transition>
+    <!-- 悬浮窗 -->
+    <Floatwindow :status="true"/>
+    <!-- <div class="mask"></div> -->
   </div>
 </template>
 
 <script>
-import marked from "marked";
 import { mapGetters } from "vuex";
 export default {
   name: "postPage",
+  inject: ["reload"],
   data() {
     return {
+      showPage: false,
       topicId: "",
       topic: {
         tags: []
@@ -92,12 +99,6 @@ export default {
   },
   computed: {
     ...mapGetters(["isLogin"]),
-    // MD转HTML
-    MDcontent: function() {
-      return marked(this.topic.content || "", {
-        sanitize: true
-      });
-    },
     // 是否禁止回复
     noreply: function() {
       return this.topic.tags.indexOf("3") >= 0;
@@ -109,6 +110,7 @@ export default {
   },
   mounted() {
     // 获取帖子内容
+    this.showPage = true;
     this.getTopic();
   },
   methods: {
@@ -159,43 +161,53 @@ export default {
        * @param replynumber { int } 当前帖子的回复数
        * @param floor { int } 回复楼层的id 0 表示不是楼中楼 初始化为0
        */
-      this.axios
-        .post("/api/reply/add", {
-          amis: this.replyObj.amis,
-          content: this.textarea,
-          topic_id: this.topicId,
-          user_id: this.$store.state.userinfo.user_id,
-          replynumber: this.topic.replynumber,
-          floor: this.replyObj.floor
-        })
-        .then(res => {
-          if (res.data.status > 0) {
-            this.$message({
-              type: "success",
-              message: "回复成功！"
-            });
-            // 将新回复显示在页面上未写 直接刷新
-          } else {
-            this.$message.error(res.data.msg);
-          }
-        })
-        .catch(err => {
-          this.$message.error("服务器错误，回复失败！");
+      if (this.textarea != "") {
+        this.axios
+          .post("/api/reply/add", {
+            amis: this.replyObj.amis,
+            content: this.textarea,
+            topic_id: this.topicId,
+            user_id: this.$store.state.userinfo.user_id,
+            replynumber: this.topic.replynumber,
+            floor: this.replyObj.floor
+          })
+          .then(res => {
+            if (res.data.status > 0) {
+              this.$message({
+                type: "success",
+                message: "回复成功！"
+              });
+              // 将新回复显示在页面上未写 直接刷新
+              this.reload();
+            } else {
+              this.$message.error(res.data.msg);
+            }
+          })
+          .catch(err => {
+            this.$message.error("服务器错误，回复失败！");
+          });
+      } else {
+        this.$message({
+          type: "warning",
+          message: "请先输入内容。"
         });
+      }
     },
     reverseReply: function() {
       // 倒序查看回复
       this.reply = this.reply.reverse();
-    },
+    }
   }
 };
 </script>
 
 <style lang='less' scoped>
+.topic-left {
+  padding: 25px;
+}
 .topic {
-  margin-top: 20px;
   .topic-head {
-    padding: 20px 0;
+    padding: 0 0 20px 0;
     border-bottom: 1px solid #d1d1d1;
 
     .topic-title {
@@ -213,11 +225,6 @@ export default {
         margin-right: 10px;
       }
     }
-  }
-  .topic-content {
-    margin-top: 10px;
-    font-size: 1.1rem;
-    line-height: 1.5;
   }
 }
 .reply-head {
@@ -277,9 +284,23 @@ export default {
 }
 .replyarea {
   margin-top: 30px;
+  margin-bottom: 50px;
   .input {
     width: 100%;
     position: relative;
+    .sendReply {
+      border-radius: 5px;
+      border: solid 1px #ffc343;
+      margin: 10px 10px 0 0;
+      color: #ffc343;
+      padding: 10px;
+      text-align: center;
+      float: right;
+      &:hover {
+        background-color: #ffc343;
+        color: #fff;
+      }
+    }
     .replymask {
       position: absolute;
       top: 0;

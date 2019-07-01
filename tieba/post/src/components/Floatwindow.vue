@@ -3,7 +3,7 @@
     <ul class="float-list">
       <li class="section-card" @click="editPost" v-show="!looking">
         <i class="el-icon-edit-outline"></i>
-        <span>发帖</span>
+        <span>发吧</span>
       </li>
       <li class="section-card" @click="reload" v-show="!looking">
         <i class="el-icon-refresh"></i>

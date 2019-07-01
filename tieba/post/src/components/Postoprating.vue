@@ -157,6 +157,7 @@ export default {
 .manage {
   float: right;
   position: relative;
+  font-size: 14px;
   i{
     position: relative;
     z-index:9;

@@ -4,6 +4,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import App from './App.vue'
 import router from './router'
 import './assets/css/global.css'
+import './assets/css/marked.css'
 import store from './store'
 import axios from "axios"
 import vueAxios from 'vue-axios'
@@ -11,7 +12,6 @@ import mavonEditor from 'mavon-editor';     //markdown编辑器
 import 'mavon-editor/dist/css/index.css';
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
-
 Vue.use(vueAxios, axios)
 Vue.use(ElementUI)
 Vue.use(mavonEditor)
@@ -22,6 +22,7 @@ Vue.directive('focus', {
     el.focus()
   }
 })
+
 const requireComponent = require.context('./components', false, /\.vue$/);
 requireComponent.keys().forEach(fileName => {
   // ??????
