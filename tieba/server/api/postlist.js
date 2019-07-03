@@ -1,10 +1,7 @@
 const Router = require('koa-router')
 const postlist = new Router()
 const db = require('../models') // 数据库
-const isToken = require('../middle/isToken')
 const Tool = require('../middle/tool')
-const MarkDown = require('markdown-it')
-const mdit = new MarkDown()
 // 获取置顶帖
 // /api/postlist/sticky
 postlist.get('/sticky', async (ctx, next) => {
@@ -47,8 +44,7 @@ postlist.post('/page', async (ctx, next) => {
       offset: 10 * (page - 1) // 跳过多少条
     }
   ).map(Tool.handleList)
-
-  if (list != []) {
+  if (list.length > 0) {
     ctx.body = {
       status: 1,
       data: list
@@ -99,13 +95,11 @@ postlist.post('/mydrafts/delete', async (ctx, next) => {
 // /api/postlist/delete
 postlist.post('/delete', async (ctx, next) => {
   // 解构文章的全部信息
-  let { user_id } = ctx.userinfo
-  let { id, title, content, tags } = ctx.request.body
+  let { id, title, content, tags, user_id } = ctx.request.body
   // 根据user_id,id来从postlist中删除文章
   let result = await db.Postlist.destroy(
     {
       where: {
-        user_id,
         id
       }
     }
@@ -137,7 +131,6 @@ postlist.post('/topic', async (ctx, next) => {
     }
   })
   topic = Tool.handleList(topic.dataValues)
-  topic.MDcontent = mdit.render(topic.content)
   // 浏览量+1
   let lookup = await db.Postlist.update({
     looknumber: ++topic.looknumber
@@ -163,7 +156,7 @@ postlist.post('/topic', async (ctx, next) => {
 // 帖子置顶\加精\禁言等请求操作
 postlist.post('/tagsadd', async (ctx, next) => {
   let { id, tags, mode, noAdd } = ctx.request.body
-  if (noAdd==undefined) {
+  if (noAdd == undefined) {
     if (mode === 'sticky') tags.push('1')
     if (mode === 'essencs') tags.push('2')
     if (mode === 'banned') tags.push('3')
@@ -174,7 +167,7 @@ postlist.post('/tagsadd', async (ctx, next) => {
   }
 
   let template = Tool.getTimestamp()
-  
+
   let result = await db.Postlist.update({
     tags: tags.join(','),
     updated_at: template

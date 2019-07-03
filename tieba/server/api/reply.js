@@ -6,7 +6,7 @@ const Tool = require('../middle/tool')
 // 根据id获取帖子的所有回复
 // /api/reply/list
 reply.post('/list', async (ctx, next) => {
-  let { id } = ctx.request.body
+  let { id, reverse } = ctx.request.body
   // 这里用不来sequelize的API，所以就直接写sql语句了
   let result = await sequelize.query(`SELECT
   reply.*,
@@ -34,6 +34,7 @@ reply.post('/list', async (ctx, next) => {
     item.replyfloor = floordata.filter(floor => floor.floor == item.id)
     return item
   })
+  updata = reverse ? updata.reverse() : updata
   if (result) {
     ctx.body = {
       status: 1,

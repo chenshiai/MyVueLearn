@@ -5,8 +5,15 @@ const router = new Router()
 const bodyParser = require('koa-bodyparser')
 const fs = require('fs')
 const Token = require('./middle/isToken')
+const static = require('koa-static')
+const path = require('path')
 app.use(bodyParser())
 app.use(Token.decrypt)
+
+// 配置静态资源加载中间件
+app.use(static(path.join(__dirname,'./public')))
+
+
 let api = fs.readdirSync(__dirname + '/api')
 api.forEach((element) => {
     let module = require(__dirname + '/api/' + element)

@@ -2,8 +2,8 @@ const config = require('../config/default')
 const jwt = require('jsonwebtoken')
 const whitelist = require('./whitelist')
 module.exports = {
-  encrypt: (data, time) => {
-    return jwt.sign(data, config.jwtSecret, { expiresIn: time })
+  encrypt: (data) => {
+    return jwt.sign(data, config.jwtSecret, { expiresIn: '1h' })
   },
   // 如果需要判断权限，先使用这个中间件
   decrypt: async (ctx, next) => {
@@ -31,16 +31,17 @@ module.exports = {
         ctx.userinfo = data
         await next()
       } catch (err) {
-        ctx.status = err.statusCode || err.status || 500;
+        console.log(err)
+        ctx.status = err.statusCode || err.status || 403;
         ctx.body = {
           status: -1,
-          msg: '身份校验出错，请在首页进行反馈，谢谢。'
+          msg: '登录信息已经失效，请重新登录。'
         }
         return
       }
     } else {
       // 没有token授权
-      console.log(url)
+      console.log(url, '未获取token')
       ctx.body = {
         status: -1,
         msg: '登录信息已过期，请重新登录。'

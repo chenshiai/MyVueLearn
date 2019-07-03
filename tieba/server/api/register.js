@@ -45,7 +45,7 @@ register.post('/', async (ctx, next) => {
           nickname: user.nickname,
           user_id: user.user_id,
           power: user.power
-        }, 60 * 60 * 24)
+        })
 
       const opts = {
         path: '/',
