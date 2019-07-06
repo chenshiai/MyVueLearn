@@ -5,8 +5,8 @@
         <div class="nav-bar-logo">LaiBA</div>
         <ul class="nav-bar-list">
           <li class="list-item" @click="lookPost">看吧</li>
-          <li class="list-item">热门</li>
-          <li class="list-item">精品</li>
+          <li class="list-item" @click="lookMyself">热门</li>
+          <li class="list-item" @click="lookMyself">精品</li>
         </ul>
         <div class="feature">
           <div class="user" v-show="isLogin">
@@ -118,7 +118,7 @@ export default {
       this.showSelfInfo = !this.showSelfInfo;
     },
     lookMyself: function() {
-      this.$message.error("个人中心功能未实现");
+      this.$message("非主要需求，并未实现");
     },
     myDrafts: function() {
       this.$router.push("/user/mydrafts");
