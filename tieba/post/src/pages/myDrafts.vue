@@ -3,7 +3,7 @@
     <Navbar/>
 
     <transition name="form-fade" mode="in-out">
-      <ul class="drafts-list section-card" v-show="showList">
+      <ul class="drafts-list section-card">
         <span class="drafts-title">草稿箱</span>
         <li v-for="(item, index) in $store.state.userDrafts" :key="index">
           <div class="title">
@@ -19,6 +19,11 @@
             <i class="el-icon-delete">删除</i>
           </span>
         </li>
+        <li  v-if="$store.state.userDrafts.length===0">
+          <div class="title">
+            <span>空空如也</span>
+          </div>
+        </li>
       </ul>
     </transition>
   </div>
@@ -28,11 +33,6 @@
 import { mapActions, mapGetters } from "vuex";
 export default {
   name: "drafts",
-  data() {
-    return {
-      showList: false
-    };
-  },
   mounted() {
     // 获取草稿
     // 判断是否登录，没登录跳去登录页
@@ -40,7 +40,6 @@ export default {
       this.$router.push("/login");
     } else {
       this.getDrafts();
-      this.showList = true;
     }
   },
   computed: {
@@ -52,6 +51,7 @@ export default {
       this.axios
         .post("/api/postlist/mydrafts", this.$store.state.userinfo)
         .then(res => {
+          // 将获取到的草稿存入vuex中，（编辑草稿时从vuex中取出）
           if (res.data.status > 0) {
             this.setUserDrafts(res.data.data);
           }

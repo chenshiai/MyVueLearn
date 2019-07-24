@@ -80,8 +80,6 @@ export default {
             if (res.data.data.length > 0) {
               this.page++;
             }
-          } else {
-            this.$message.error(res.data.msg);
           }
         })
         .catch(() => {
