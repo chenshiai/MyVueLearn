@@ -9,6 +9,7 @@
       <div class="post-detail">
         <div class="post-title">{{ postInfo.postname }}</div>
         <div class="post-introduction">{{ postInfo.introduction }}</div>
+        
         <div :class="isLogin?'follow followed':'follow nofollow'">
           <span v-show="!isLogin"  @click="follow">
             <i class="el-icon-star-on"></i>加入本吧
