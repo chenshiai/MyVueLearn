@@ -1,4 +1,4 @@
-// 在这里管理所有模板
+// 在这里管理所有数据模板
 const Userlist = require('./user/userlist')
 const Postlist = require('./post/postlist')
 const Drafts = require('./post/drafts')

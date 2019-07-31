@@ -7,7 +7,6 @@ const Tool = require('../middle/tool')
 // /api/reply/list
 reply.post('/list', async (ctx, next) => {
   let { id, reverse } = ctx.request.body
-  // 这里用不来sequelize的API，所以就直接写sql语句了
   let result = await sequelize.query(`SELECT
   reply.*,
   A.nickname,
